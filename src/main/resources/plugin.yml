@@ -1,0 +1,30 @@
+name: QuickbarPlugin
+main: com.gmail.leal.mendo.QuickbarPlugin.QuickbarPlugin
+version: 1.0
+author: agrendath
+commands:
+  tiago:
+    description: Returns useful information about tiago
+    usage: /tiago
+    permission: quickbarplugin.tiago
+    permission-message: You don't have permission to use this extremely powerful command
+  emma:
+    description: Gives the player the quickbar switching tool
+    usage: /emma
+    permission: quickbarplugin.emma
+    permission-message: You don't have permission for that
+  emma2:
+    description: Converts xp into xp bottles
+    usage: /emma2 <amount of bottles>
+    permission: quickbarplugin.emma2
+    permission-message: You don't have permission for that
+  janita:
+    description: Return the amount of deaths for a specific player
+    usage: /janita <playername>
+    permission: quickbarplugin.janita
+    permission-message: You don't have permission for that
+  lucas:
+    description: Returns useful information about lucas
+    usage: /lucas
+    permission: quickbarplugin.lucas
+    permission-message: You don't have permission to use this extremely powerful command
