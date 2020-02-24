@@ -1,1 +1,2 @@
-# quickbarplugin
+# Quickbarplugin
+Minecraft Quickbarplugin
