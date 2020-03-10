@@ -63,10 +63,10 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         		}
         		else {
         			if(Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && isInConfig(args[0]))  {
-        				sender.sendMessage("§d" + StringUtils.capitalise(args[0]) + " has died " + this.getConfig().getString("deaths." + Bukkit.getOfflinePlayer(args[0]).getUniqueId()) + " time(s).");
+        				sender.sendMessage("ï¿½d" + StringUtils.capitalise(args[0]) + " has died " + this.getConfig().getString("deaths." + Bukkit.getOfflinePlayer(args[0]).getUniqueId()) + " time(s).");
         			}
         			else  {
-        				sender.sendMessage("§4Couldn't find player or player has never died.");
+        				sender.sendMessage("ï¿½4Couldn't find player or player has never died.");
         			}
         			return true;
         		}
@@ -81,11 +81,11 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	if(cmd.getName().equalsIgnoreCase("tiago"))  {
     		if(sender.hasPermission("quickbarplugin.tiago"))  {
     			// display message "gay"
-    			sender.sendMessage("§dgay");
+    			sender.sendMessage("ï¿½dgay");
     		}
     		else  {
     			// inform the user that they don't have the permission to use this command
-    			sender.sendMessage("§4You don't have permission to use this command.");
+    			sender.sendMessage("ï¿½4You don't have permission to use this command.");
     		}
     		return true;
     	}
@@ -94,11 +94,11 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	if(cmd.getName().equalsIgnoreCase("lucas"))  {
     		if(sender.hasPermission("quickbarplugin.lucas"))  {
     			// display message "gay"
-    			sender.sendMessage("§d-> is useless");
+    			sender.sendMessage("ï¿½d-> is useless");
     		}
     		else  {
     			// inform the user that they don't have the permission to use this command
-    			sender.sendMessage("§4You don't have permission to use this command.");
+    			sender.sendMessage("ï¿½4You don't have permission to use this command.");
     		}
     		return true;
     	} 
@@ -131,7 +131,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     					int amount = Integer.parseInt(args[0]);
     					int xpAmount = amount*100;
     					Player p = (Player) sender;
-    					Inventory inv = p.getInventory();
+    					//Inventory inv = p.getInventory();
     					
     					// Check if the player has enough xp to get the required amount of bottles
     					if(xpAmount > getPlayerExp(p))  {
