@@ -63,7 +63,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         		}
         		else {
         			if(Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && isInConfig(args[0]))  {
-        				sender.sendMessage("�d" + StringUtils.capitalise(args[0]) + " has died " + this.getConfig().getString("deaths." + Bukkit.getOfflinePlayer(args[0]).getUniqueId()) + " time(s).");
+        				sender.sendMessage("�d" + args[0].substring(0, 1).toUpperCase() + args[0].substring(1) + " has died " + this.getConfig().getString("deaths." + Bukkit.getOfflinePlayer(args[0]).getUniqueId()) + " time(s).");
         			}
         			else  {
         				sender.sendMessage("�4Couldn't find player or player has never died.");
