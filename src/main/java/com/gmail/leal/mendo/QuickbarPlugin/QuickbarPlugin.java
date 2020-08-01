@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -172,6 +173,31 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	return false; 
     }
     
+    @EventHandler
+    public void onKill(PlayerDeathEvent e)  {
+    	Player killed = e.getEntity();
+    	Player killer = killed.getKiller();
+    	if(killed.getUniqueId() == UUID.fromString("b2a75ec7-c556-4f47-8b61-bfb1780b4ac5"))  {  // killing tiago
+    		addSoul(killer);
+    	}
+    	else if(killed.getUniqueId() == UUID.fromString("df736569-ffed-40e7-9c92-074661b86b09"))  {  // killing lucas (10% chance of tiago soul)
+    		int random = (int) (Math.random() * 10 + 1);  // random int in interval [0, 9] (inclusive)
+    		if(random == 0)  {
+    			addSoul(killer);
+    		}
+    	}
+    }
+    
+    public void addSoul(Player player)  {
+    	player.sendMessage("§6Congratulations! You have obtained a §5Tiago Soul");
+    	if(this.soulsRegisteredInConfig(player))  {
+			this.getConfig().set("souls." + player.getUniqueId(), this.getConfig().getInt("souls." + player.getUniqueId()) + 1);
+		}
+		else  {
+			this.getConfig().set("souls." + player.getUniqueId(), 1);
+		}
+    }
+    
     public static void giveItem(Player p, ItemStack item)  {
     	Inventory inv = p.getInventory();
     	if(inv.firstEmpty() == -1)  {
@@ -316,6 +342,18 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		return true;
     	}
     	else  {
+    		return false;
+    	}
+    }
+    
+    /**
+     * Checks if this player has a 'tiago souls' count registered in the config file
+     */
+    private boolean soulsRegisteredInConfig(Player player)  {
+    	if(this.getConfig().isSet("souls." + player.getUniqueId()))  {
+    		return true;
+    	}
+    	else {
     		return false;
     	}
     }
