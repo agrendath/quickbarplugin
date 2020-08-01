@@ -63,10 +63,10 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         		}
         		else {
         			if(Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && isInConfig(args[0]))  {
-        				sender.sendMessage("�d" + args[0].substring(0, 1).toUpperCase() + args[0].substring(1) + " has died " + this.getConfig().getString("deaths." + Bukkit.getOfflinePlayer(args[0]).getUniqueId()) + " time(s).");
+        				sender.sendMessage("§d" + args[0].substring(0, 1).toUpperCase() + args[0].substring(1) + " has died " + this.getConfig().getString("deaths." + Bukkit.getOfflinePlayer(args[0]).getUniqueId()) + " time(s).");
         			}
         			else  {
-        				sender.sendMessage("�4Couldn't find player or player has never died.");
+        				sender.sendMessage("§4Couldn't find player or player has never died.");
         			}
         			return true;
         		}
@@ -81,11 +81,11 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	if(cmd.getName().equalsIgnoreCase("tiago"))  {
     		if(sender.hasPermission("quickbarplugin.tiago"))  {
     			// display message "gay"
-    			sender.sendMessage("�dgay");
+    			sender.sendMessage("§dgay");
     		}
     		else  {
     			// inform the user that they don't have the permission to use this command
-    			sender.sendMessage("�4You don't have permission to use this command.");
+    			sender.sendMessage("§4You don't have permission to use this command.");
     		}
     		return true;
     	}
@@ -94,11 +94,11 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	if(cmd.getName().equalsIgnoreCase("lucas"))  {
     		if(sender.hasPermission("quickbarplugin.lucas"))  {
     			// display message "gay"
-    			sender.sendMessage("�d-> is useless");
+    			sender.sendMessage("§d-> is useless");
     		}
     		else  {
     			// inform the user that they don't have the permission to use this command
-    			sender.sendMessage("�4You don't have permission to use this command.");
+    			sender.sendMessage("§4You don't have permission to use this command.");
     		}
     		return true;
     	} 
@@ -113,7 +113,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			return true;
     		}
     		else  {
-    			sender.sendMessage("You are not allowed to do this.");
+    			sender.sendMessage("§4You are not allowed to do this.");
     			return false;
     		}
     	}
@@ -162,7 +162,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			
     		}
     		else  {
-    			sender.sendMessage("You are not allowed to do this.");
+    			sender.sendMessage("§4You are not allowed to do this.");
     			return false;
     		}
     	}

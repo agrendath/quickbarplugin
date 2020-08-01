@@ -1,7 +1,8 @@
 name: QuickbarPlugin
 main: com.gmail.leal.mendo.QuickbarPlugin.QuickbarPlugin
 version: 1.0
-author: agrendath
+author: agrendatha
+api-version: 1.16
 commands:
   tiago:
     description: Returns useful information about tiago
