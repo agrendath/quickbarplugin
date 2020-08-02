@@ -348,11 +348,11 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     public void onKill(PlayerDeathEvent e)  {
     	Player killed = e.getEntity();
     	Player killer = killed.getKiller();
-    	if(killed.getUniqueId() == UUID.fromString("b2a75ec7-c556-4f47-8b61-bfb1780b4ac5"))  {  // killing tiago
+    	if(killed.getUniqueId().toString().equals("b2a75ec7-c556-4f47-8b61-bfb1780b4ac5")) {  // killing tiago
     		killer.sendMessage("§6Congratulations! You have obtained a §5Tiago Soul");
     		this.changeSouls(killer, 1);
     	}
-    	else if(killed.getUniqueId() == UUID.fromString("df736569-ffed-40e7-9c92-074661b86b09"))  {  // killing lucas (10% chance of tiago soul)
+    	else if(killed.getUniqueId().toString().equals("df736569-ffed-40e7-9c92-074661b86b09"))  {  // killing lucas (10% chance of tiago soul)
     		int random = (int) (Math.random() * 10 + 1);  // random int in interval [0, 9] (inclusive)
     		if(random == 0)  {
     			killer.sendMessage("§6Congratulations! You have obtained a §5Tiago Soul");
