@@ -162,9 +162,11 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		}
     		if(Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && this.getConfig().isSet("applesEaten." + ((Player)sender).getUniqueId().toString()))  {
 				sender.sendMessage("§d" + args[0].substring(0, 1).toUpperCase() + args[0].substring(1) + " has eaten " + this.getConfig().getString("applesEaten." + Bukkit.getOfflinePlayer(args[0]).getUniqueId()) + " apple(s)");
-			}
+				return true;
+    		}
 			else  {
 				sender.sendMessage("§4Couldn't find player or player has never eaten an apple");
+				return true;
 			}
     		
     	}
