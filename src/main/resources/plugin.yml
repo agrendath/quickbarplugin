@@ -34,3 +34,8 @@ commands:
     usage: /souls give <player> <amount>
     permission: quickbarplugin.souls
     permission-message: You don't have permission to manipulate tiago souls
+  soulenchant:
+    description: Enchants the item in your hand with a soul enchantment, available enchantments are absorption
+    usage: /soulenchant <enchantment>
+    permission: quickbarplugin.soulenchant
+    permission-message: You don't have permission to enchant items with tiago souls

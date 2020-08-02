@@ -56,7 +56,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
     	// the /souls command that shows a player's tiago souls
     	if(cmd.getName().equalsIgnoreCase("souls"))  {
-    		if(sender.hasPermission("quickbarplugin.souls"))  {
+    		if(sender.hasPermission("quickbarplugin.souls") && sender instanceof Player)  {
     			Player player = Bukkit.getPlayer(sender.getName());
     			if(args.length == 0)  {
         			if(player != null)  {
@@ -227,7 +227,20 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		}
     	}
     	
-    	//If this has happened the function will return true. 
+    	if(cmd.getName().equalsIgnoreCase("soulenchant"))  {
+    		if(sender.hasPermission("quickbarplugin.soulenchant") && sender instanceof Player)  {
+    			Player player = (Player)sender;
+    			ItemStack item = player.getInventory().getItemInMainHand();
+    			Material type = item.getType();
+    			
+    		}
+    		else  {
+    			sender.sendMessage("§4You are not allowed to do this.");
+    			return false;
+    		}
+    	}
+    	
+    	// If this has happened the function will return true. 
         // If this hasn't happened the value of false will be returned.
     	return false; 
     }
