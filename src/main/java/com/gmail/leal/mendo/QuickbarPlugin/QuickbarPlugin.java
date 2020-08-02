@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,6 +21,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -83,15 +85,15 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         					if(receiver != null)  {
         						this.changeSouls(player, amount*-1);
         						this.changeSouls(receiver, amount);
-        						receiver.sendMessage("§5You received " + amount + " tiago souls from " + player.getName());
-        						sender.sendMessage("§5Transferred " + amount + " tiago souls to " + args[1]);
+        						receiver.sendMessage("§5You received " + amount + " tiago soul(s) from " + player.getName());
+        						sender.sendMessage("§5Transferred " + amount + " tiago soul(s) to " + args[1]);
         						return true;
         					}
         					else  {
         						if(Bukkit.getOfflinePlayer(args[1]).hasPlayedBefore())  {
         							this.changeSouls(player, amount*-1);
                 					this.changeSoulsFromUUID(Bukkit.getOfflinePlayer(args[1]).getUniqueId(), amount);
-                					sender.sendMessage("§5Transferred " + amount + " tiago souls to " + args[1]);
+                					sender.sendMessage("§5Transferred " + amount + " tiago soul(s) to " + args[1]);
                 					return true;
                 				}
                 				else  {
@@ -142,6 +144,29 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			sender.sendMessage("You don't have permission to use the /janita command");
     			return true;
     		}
+    	}
+    	
+    	// The /janita2 command that shows a player's amount of apples eaten
+    	if(cmd.getName().equalsIgnoreCase("janita2"))  {
+    		if(!sender.hasPermission("quickbarplugin.janita2"))  {
+    			sender.sendMessage("§4You do not have permission for this");
+    			return true;
+    		}
+    		if(args.length != 1)  {
+    			sender.sendMessage("§4Invalid amount of arguments");
+    			return false;
+    		}
+    		if(!(sender instanceof Player))  {
+    			sender.sendMessage("§4Only players can use this command");
+    			return true;
+    		}
+    		if(Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && this.getConfig().isSet("applesEaten." + ((Player)sender).getUniqueId().toString()))  {
+				sender.sendMessage("§d" + args[0].substring(0, 1).toUpperCase() + args[0].substring(1) + " has eaten " + this.getConfig().getString("applesEaten." + Bukkit.getOfflinePlayer(args[0]).getUniqueId()) + " apple(s).");
+			}
+			else  {
+				sender.sendMessage("§4Couldn't find player or player has never died.");
+			}
+    		
     	}
     	
     	// The /tiago command that just returns gay in pink
@@ -371,6 +396,25 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	newLore.add(enchantment);
     	meta.setLore(newLore);
     	item.setItemMeta(meta);
+    }
+    
+    @EventHandler
+    public void onPlayerFoodChange(FoodLevelChangeEvent e)  {
+    	HumanEntity entity = e.getEntity();
+    	if(e.getItem().getType().equals(Material.APPLE) && entity instanceof Player)  {
+    		Player player = (Player) entity;
+    		this.addAppleCount(player.getUniqueId());
+    	}
+    }
+    
+    private void addAppleCount(UUID playerId)  {
+    	String path = "applesEaten." + playerId.toString();
+    	if(this.getConfig().isSet(path))  {
+    		this.getConfig().set(path, this.getConfig().getInt(path) + 1);
+    	}
+    	else  {
+    		this.getConfig().set(path, 1);
+    	}
     }
     
     private boolean hasCustomEnchant(ItemStack item, String enchantment)  {

@@ -24,6 +24,11 @@ commands:
     usage: /janita <playername>
     permission: quickbarplugin.janita
     permission-message: You don't have permission for that
+  janita2:
+    description: Return the amount of apples eaten for a specific player
+    usage: /janita2 <playername>
+    permission: quickbarplugin.janita2
+    permission-message: You don't have permission for that
   lucas:
     description: Returns useful information about lucas
     usage: /lucas
