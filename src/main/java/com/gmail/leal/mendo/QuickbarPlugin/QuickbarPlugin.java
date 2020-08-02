@@ -132,10 +132,10 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         		}
         		else {
         			if(Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && isInConfig(args[0]))  {
-        				sender.sendMessage("§d" + args[0].substring(0, 1).toUpperCase() + args[0].substring(1) + " has died " + this.getConfig().getString("deaths." + Bukkit.getOfflinePlayer(args[0]).getUniqueId()) + " time(s).");
+        				sender.sendMessage("§d" + args[0].substring(0, 1).toUpperCase() + args[0].substring(1) + " has died " + this.getConfig().getString("deaths." + Bukkit.getOfflinePlayer(args[0]).getUniqueId()) + " time(s)");
         			}
         			else  {
-        				sender.sendMessage("§4Couldn't find player or player has never died.");
+        				sender.sendMessage("§4Couldn't find player or player has never died");
         			}
         			return true;
         		}
@@ -161,10 +161,10 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			return true;
     		}
     		if(Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && this.getConfig().isSet("applesEaten." + ((Player)sender).getUniqueId().toString()))  {
-				sender.sendMessage("§d" + args[0].substring(0, 1).toUpperCase() + args[0].substring(1) + " has eaten " + this.getConfig().getString("applesEaten." + Bukkit.getOfflinePlayer(args[0]).getUniqueId()) + " apple(s).");
+				sender.sendMessage("§d" + args[0].substring(0, 1).toUpperCase() + args[0].substring(1) + " has eaten " + this.getConfig().getString("applesEaten." + Bukkit.getOfflinePlayer(args[0]).getUniqueId()) + " apple(s)");
 			}
 			else  {
-				sender.sendMessage("§4Couldn't find player or player has never died.");
+				sender.sendMessage("§4Couldn't find player or player has never eaten an apple");
 			}
     		
     	}
