@@ -1,7 +1,7 @@
 name: QuickbarPlugin
 main: com.gmail.leal.mendo.QuickbarPlugin.QuickbarPlugin
 version: 1.0
-author: agrendatha
+author: agrendath
 api-version: 1.16
 commands:
   tiago:
@@ -29,3 +29,8 @@ commands:
     usage: /lucas
     permission: quickbarplugin.lucas
     permission-message: You don't have permission to use this extremely powerful command
+  souls:
+    description: Returns your tiago souls balance or lets you give souls to another player
+    usage: /souls give <player> <amount>
+    permission: quickbarplugin.souls
+    permission-message: You don't have permission to manipulate tiago souls

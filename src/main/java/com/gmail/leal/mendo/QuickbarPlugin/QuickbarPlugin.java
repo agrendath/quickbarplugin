@@ -54,6 +54,65 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    	// the /souls command that shows a player's tiago souls
+    	if(cmd.getName().equalsIgnoreCase("souls"))  {
+    		if(sender.hasPermission("quickbarplugin.souls"))  {
+    			Player player = Bukkit.getPlayer(sender.getName());
+    			if(args.length == 0)  {
+        			if(player != null)  {
+        				sender.sendMessage("§5Tiago Soul Balance: " + this.getSouls(player));
+        				return true;
+        			}
+        			else  {
+        				sender.sendMessage("§4Invalid command use, you are not a player.");
+        				return false;
+        			}
+        		}
+        		else if(args.length == 3 && args[0].equalsIgnoreCase("give"))  {
+        			Player receiver = Bukkit.getPlayer(args[1]);
+        			try  {
+        				int amount = Integer.parseInt(args[2]);
+        				if(amount > 0 && amount <= this.getSouls(player))  {
+        					if(receiver != null)  {
+        						this.changeSouls(player, amount*-1);
+        						this.changeSouls(receiver, amount);
+        						receiver.sendMessage("§5You received " + amount + " tiago souls from " + player.getName());
+        						sender.sendMessage("§5Transferred " + amount + " tiago souls to " + args[1]);
+        						return true;
+        					}
+        					else  {
+        						if(Bukkit.getOfflinePlayer(args[1]).hasPlayedBefore())  {
+        							this.changeSouls(player, amount*-1);
+                					this.changeSoulsFromUUID(Bukkit.getOfflinePlayer(args[1]).getUniqueId(), amount);
+                					sender.sendMessage("§5Transferred " + amount + " tiago souls to " + args[1]);
+                					return true;
+                				}
+                				else  {
+                					sender.sendMessage("Cannot find player " + args[1]);
+                    				return false;
+                				}
+        					}
+        				}
+        				else  {
+    						sender.sendMessage("Invalid amount or you do not have enough souls to complete this transaction");
+    						return false;
+    					}
+        			}
+        			catch(NumberFormatException nfe)  {
+    					sender.sendMessage(args[2] + " is not a valid amount");
+    					return false;
+    				}
+        		}
+        		else   {
+        			return false;
+        		}
+        	}
+    		else  {
+    			sender.sendMessage("You don't have permission to manipulate tiago souls");
+    			return false;
+    		}
+    	}
+    	
     	// The /janita command that shows a player's death count
     	if(cmd.getName().equalsIgnoreCase("janita"))  {
     		
@@ -178,24 +237,63 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	Player killed = e.getEntity();
     	Player killer = killed.getKiller();
     	if(killed.getUniqueId() == UUID.fromString("b2a75ec7-c556-4f47-8b61-bfb1780b4ac5"))  {  // killing tiago
-    		addSoul(killer);
+    		killer.sendMessage("§6Congratulations! You have obtained a §5Tiago Soul");
+    		this.changeSouls(killer, 1);
     	}
     	else if(killed.getUniqueId() == UUID.fromString("df736569-ffed-40e7-9c92-074661b86b09"))  {  // killing lucas (10% chance of tiago soul)
     		int random = (int) (Math.random() * 10 + 1);  // random int in interval [0, 9] (inclusive)
     		if(random == 0)  {
-    			addSoul(killer);
+    			killer.sendMessage("§6Congratulations! You have obtained a §5Tiago Soul");
+    			this.changeSouls(killer, 1);
     		}
     	}
     }
     
-    public void addSoul(Player player)  {
-    	player.sendMessage("§6Congratulations! You have obtained a §5Tiago Soul");
+    private int getSouls(Player player)  {
     	if(this.soulsRegisteredInConfig(player))  {
-			this.getConfig().set("souls." + player.getUniqueId(), this.getConfig().getInt("souls." + player.getUniqueId()) + 1);
-		}
-		else  {
-			this.getConfig().set("souls." + player.getUniqueId(), 1);
-		}
+    		return this.getConfig().getInt("souls." + player.getUniqueId());
+    	}
+    	else  {
+    		return 0;
+    	}
+    }
+    
+    /**
+     * Will change a player's souls by [change]
+     * @pre If the change is negative, it must not be smaller or equal to the amount of souls the player already has
+     * 		| (change < 0) ? (change*-1 <= this.getSouls(player)) : true
+     */
+    private void changeSouls(Player player, int change)  {
+    	String path = "souls." + player.getUniqueId();
+    	if(this.soulsRegisteredInConfig(player))  {
+    		this.getConfig().set(path, this.getConfig().getInt(path) + change);
+    		saveConfig();
+    	}
+    	else  {
+    		if(change > 0)  {
+    			this.getConfig().set(path, change);
+    			saveConfig();
+    		}
+    	}
+    }
+    
+    private void changeSoulsFromUUID(UUID uuid, int change)  {
+    	String id = uuid.toString();
+    	String path = "souls." + id;
+    	boolean registered = false;
+    	if(this.getConfig().isSet("souls." + id))  {
+    		registered = true;
+    	}
+    	if(registered)  {
+    		this.getConfig().set(path, this.getConfig().getInt(path) + change);
+    		saveConfig();
+    	}
+    	else  {
+    		if(change > 0)  {
+    			this.getConfig().set(path, change);
+    			saveConfig();
+    		}
+    	}
     }
     
     public static void giveItem(Player p, ItemStack item)  {
