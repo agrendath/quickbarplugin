@@ -2,6 +2,9 @@ package com.gmail.leal.mendo.QuickbarPlugin;
 
 import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -9,10 +12,12 @@ import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -28,6 +33,8 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 public class QuickbarPlugin extends JavaPlugin implements Listener{
+	
+	final static List<Material> validAbsorptionTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE})); 
 	
 	@Override
     public void onEnable() {
@@ -65,7 +72,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         			}
         			else  {
         				sender.sendMessage("§4Invalid command use, you are not a player.");
-        				return false;
+        				return true;
         			}
         		}
         		else if(args.length == 3 && args[0].equalsIgnoreCase("give"))  {
@@ -109,7 +116,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         	}
     		else  {
     			sender.sendMessage("You don't have permission to manipulate tiago souls");
-    			return false;
+    			return true;
     		}
     	}
     	
@@ -133,7 +140,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		}
     		else  {
     			sender.sendMessage("You don't have permission to use the /janita command");
-    			return false;
+    			return true;
     		}
     	}
     	
@@ -174,7 +181,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		}
     		else  {
     			sender.sendMessage("§4You are not allowed to do this.");
-    			return false;
+    			return true;
     		}
     	}
     	
@@ -223,20 +230,54 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		}
     		else  {
     			sender.sendMessage("§4You are not allowed to do this.");
-    			return false;
+    			return true;
     		}
     	}
     	
     	if(cmd.getName().equalsIgnoreCase("soulenchant"))  {
     		if(sender.hasPermission("quickbarplugin.soulenchant") && sender instanceof Player)  {
-    			Player player = (Player)sender;
-    			ItemStack item = player.getInventory().getItemInMainHand();
-    			Material type = item.getType();
+    			if(args.length != 1)  {
+    				sender.sendMessage("§4Invalid arguments");
+    				return false;
+    			}
     			
+    			if(args[0].equalsIgnoreCase("absorption"))  {
+    				Player player = (Player)sender;
+        			ItemStack item = player.getInventory().getItemInMainHand();
+        			Material type = item.getType();
+        			List<Material> validTypes = QuickbarPlugin.validAbsorptionTypes;
+        			
+        			if(validTypes.contains(type))  {
+        				if(this.hasCustomEnchant(item, "Absorption"))  {
+            				sender.sendMessage("§4This item already has the given enchantment");
+            				return true;
+            			}
+        				
+        				// Item is of a valid type to be enchanted
+        				if(this.getSouls(player) >= 1)  {
+        					// Player has enough souls to make the enchantment
+        					this.customEnchant(player.getInventory().getItemInMainHand(), "Absorption");
+        					this.changeSouls(player, -1);
+        					player.sendMessage("§5Enchantment Complete");
+        				}
+        				else  {
+        					player.sendMessage("§4You need 1 soul to enchant this item, unfortunately you are soulless");
+        				}
+        				return true;
+        			}
+        			else  {
+        				sender.sendMessage("§4The given enchantment cannot be applied to this item");
+        				return true;
+        			}
+    			}
+    			else  {
+    				sender.sendMessage("§4Invalid enchantment");
+    				return true;
+    			}
     		}
     		else  {
     			sender.sendMessage("§4You are not allowed to do this.");
-    			return false;
+    			return true;
     		}
     	}
     	
@@ -259,6 +300,87 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			killer.sendMessage("§6Congratulations! You have obtained a §5Tiago Soul");
     			this.changeSouls(killer, 1);
     		}
+    	}
+    }
+    
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent e)  {
+    	//getLogger().info("PlayerInteract even triggered...");
+    	if(e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK))  {
+    		Player player = e.getPlayer();
+    		if(e.getItem() != null)  {
+    			if(e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase("Quickbar Switcher"))  {
+        			// Switch Quickbar
+        			switchItems(player);
+        			
+        		}
+    		}
+    	}
+    }
+    
+    @EventHandler
+    public void onExpBottle(ExpBottleEvent e)  {
+    	e.setExperience(100);
+    }
+    
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e)  {
+    	Player player = (Player) e.getEntity();
+    	if(player instanceof Player)  {
+    		if(isInConfig(player.getName()))  { // Add death to config
+    			this.getConfig().set("deaths." + player.getUniqueId(), this.getConfig().getInt("deaths." + player.getUniqueId()) + 1);
+    			saveConfig();
+    		}
+    		else  { // Create new entry for player, then add death to config
+    			this.getConfig().set("deaths." + player.getUniqueId(), 1);
+    			saveConfig();
+    		}
+    	}
+    }
+    
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent e)  {
+    	Player player = e.getPlayer();
+    	ItemStack item = player.getInventory().getItemInMainHand();
+    	if(QuickbarPlugin.validAbsorptionTypes.contains(item.getType()) && item.getItemMeta() != null && item.getItemMeta().hasLore() && item.getItemMeta().getLore().contains("Absorption"))  {
+    		// The item with which the block is being broken is of a valid type and contains the absorption echantment
+    		Block block = e.getBlock();
+    		Collection<ItemStack> drops = block.getDrops(item, player);  // Get a list of the drops that the block should provide
+    		e.setDropItems(false);  // Prevent the block from dropping items
+    		for(ItemStack i : drops)  {
+    			this.giveItem(player, i);  // Give all the drops straight to the player's inventory
+    		}
+    	}
+    }
+    
+    /**
+     * @pre The given enchantment is valid for the given item, must be checked beforehand
+     */
+    private void customEnchant(ItemStack item, String enchantment) {
+    	ItemMeta meta = item.getItemMeta();
+    	if(this.hasCustomEnchant(item, enchantment) || meta == null)  {
+    		return;
+    	}
+    	List<String> newLore = null;
+    	if(meta.hasLore())  {
+    		newLore = meta.getLore();
+    	}
+    	else  {
+    		newLore = new ArrayList<String>();
+    	}
+    	newLore.add(enchantment);
+    	meta.setLore(newLore);
+    	item.setItemMeta(meta);
+    }
+    
+    private boolean hasCustomEnchant(ItemStack item, String enchantment)  {
+    	ItemMeta meta = item.getItemMeta();
+    	List<String> lore = meta.getLore();
+    	if(meta != null && lore != null && lore.contains(enchantment))  {
+    		return true;
+    	}
+    	else  {
+    		return false;
     	}
     }
     
@@ -309,7 +431,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	}
     }
     
-    public static void giveItem(Player p, ItemStack item)  {
+    public void giveItem(Player p, ItemStack item)  {
     	Inventory inv = p.getInventory();
     	if(inv.firstEmpty() == -1)  {
     		p.getWorld().dropItem(p.getLocation(), item);
@@ -410,41 +532,6 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     				}
 				}
 			}
-    	}
-    }
-    
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent e)  {
-    	//getLogger().info("PlayerInteract even triggered...");
-    	if(e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK))  {
-    		Player player = e.getPlayer();
-    		if(e.getItem() != null)  {
-    			if(e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase("Quickbar Switcher"))  {
-        			// Switch Quickbar
-        			switchItems(player);
-        			
-        		}
-    		}
-    	}
-    }
-    
-    @EventHandler
-    public void onExpBottle(ExpBottleEvent e)  {
-    	e.setExperience(100);
-    }
-    
-    @EventHandler
-    public void onDeath(PlayerDeathEvent e)  {
-    	Player player = (Player) e.getEntity();
-    	if(player instanceof Player)  {
-    		if(isInConfig(player.getName()))  { // Add death to config
-    			this.getConfig().set("deaths." + player.getUniqueId(), this.getConfig().getInt("deaths." + player.getUniqueId()) + 1);
-    			saveConfig();
-    		}
-    		else  { // Create new entry for player, then add death to config
-    			this.getConfig().set("deaths." + player.getUniqueId(), 1);
-    			saveConfig();
-    		}
     	}
     }
     
