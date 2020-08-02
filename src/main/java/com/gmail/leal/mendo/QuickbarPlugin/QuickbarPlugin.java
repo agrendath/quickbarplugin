@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,6 +38,8 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 public class QuickbarPlugin extends JavaPlugin implements Listener{
 	
 	final static List<Material> validAbsorptionTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE})); 
+	final static String enchantmentIndestructibility = "Indestructibility";
+	final static String enchantmentAbsorption = "Absorption";
 	
 	@Override
     public void onEnable() {
@@ -268,23 +271,28 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     				return false;
     			}
     			
-    			if(args[0].equalsIgnoreCase("absorption"))  {
-    				Player player = (Player)sender;
-        			ItemStack item = player.getInventory().getItemInMainHand();
+    			Player player = (Player)sender;
+    			ItemStack item = player.getInventory().getItemInMainHand();
+    			if(args[0].equalsIgnoreCase(QuickbarPlugin.enchantmentAbsorption))  {
         			Material type = item.getType();
         			List<Material> validTypes = QuickbarPlugin.validAbsorptionTypes;
         			
         			if(validTypes.contains(type))  {
-        				if(this.hasCustomEnchant(item, "Absorption"))  {
+        				if(this.hasCustomEnchant(item, QuickbarPlugin.enchantmentAbsorption))  {
             				sender.sendMessage("§4This item already has the given enchantment");
             				return true;
             			}
         				
         				// Item is of a valid type to be enchanted
         				if(this.getSouls(player) >= 1)  {
+        					if(player.getLevel() < 30)  {
+            					sender.sendMessage("§4You do not have enough xp, you need 1395 exp (= the first 30 levels)");
+            					return true;
+            				}
         					// Player has enough souls to make the enchantment
-        					this.customEnchant(player.getInventory().getItemInMainHand(), "Absorption");
+        					this.customEnchant(player.getInventory().getItemInMainHand(), QuickbarPlugin.enchantmentAbsorption);
         					this.changeSouls(player, -1);
+        					QuickbarPlugin.takeExp(player, 1395);
         					player.sendMessage("§5Enchantment Complete");
         				}
         				else  {
@@ -296,6 +304,29 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         				sender.sendMessage("§4The given enchantment cannot be applied to this item");
         				return true;
         			}
+    			}
+    			else if(args[0].equalsIgnoreCase(QuickbarPlugin.enchantmentIndestructibility))  {
+    				Material type = item.getType();
+    				if(!(type.equals(Material.DIAMOND_SWORD) || type.equals(Material.NETHERITE_SWORD)))  {
+    					sender.sendMessage("§4This enchantment can only be applied to diamond or netherite swords");
+    					return true;
+    				}
+    				if(this.getSouls(player) < 1)  {
+    					sender.sendMessage("§4You do not have enough tiago souls to perform this enchantment (1 needed)");
+    					return true;
+    				}
+    				if(player.getLevel() < 30)  {
+    					sender.sendMessage("§4You do not have enough xp, you need 1395 exp (= the first 30 levels)");
+    					return true;
+    				}
+    				this.customEnchant(item, QuickbarPlugin.enchantmentIndestructibility);
+    				this.changeSouls(player, -1);
+    				QuickbarPlugin.takeExp(player, 1395);
+    				ItemMeta meta = item.getItemMeta();
+    				meta.setUnbreakable(true);
+    				item.setItemMeta(meta);
+    				sender.sendMessage("§5Enchantment complete");
+    				return true;
     			}
     			else  {
     				sender.sendMessage("§4Invalid enchantment");
@@ -369,7 +400,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     public void onBlockBreak(BlockBreakEvent e)  {
     	Player player = e.getPlayer();
     	ItemStack item = player.getInventory().getItemInMainHand();
-    	if(QuickbarPlugin.validAbsorptionTypes.contains(item.getType()) && item.getItemMeta() != null && item.getItemMeta().hasLore() && item.getItemMeta().getLore().contains("Absorption"))  {
+    	if(QuickbarPlugin.validAbsorptionTypes.contains(item.getType()) && item.getItemMeta() != null && item.getItemMeta().hasLore() && item.getItemMeta().getLore().contains(QuickbarPlugin.enchantmentAbsorption))  {
     		// The item with which the block is being broken is of a valid type and contains the absorption echantment
     		Block block = e.getBlock();
     		Collection<ItemStack> drops = block.getDrops(item, player);  // Get a list of the drops that the block should provide
@@ -377,6 +408,15 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		for(ItemStack i : drops)  {
     			this.giveItem(player, i);  // Give all the drops straight to the player's inventory
     		}
+    	}
+    }
+    
+    @EventHandler
+    public void onPlayerFoodChange(FoodLevelChangeEvent e)  {
+    	HumanEntity entity = e.getEntity();
+    	if(e.getItem().getType().equals(Material.APPLE) && entity instanceof Player)  {
+    		Player player = (Player) entity;
+    		this.addAppleCount(player.getUniqueId());
     	}
     }
     
@@ -398,15 +438,6 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	newLore.add(enchantment);
     	meta.setLore(newLore);
     	item.setItemMeta(meta);
-    }
-    
-    @EventHandler
-    public void onPlayerFoodChange(FoodLevelChangeEvent e)  {
-    	HumanEntity entity = e.getEntity();
-    	if(e.getItem().getType().equals(Material.APPLE) && entity instanceof Player)  {
-    		Player player = (Player) entity;
-    		this.addAppleCount(player.getUniqueId());
-    	}
     }
     
     private void addAppleCount(UUID playerId)  {
