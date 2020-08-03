@@ -453,6 +453,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	else  {
     		this.getConfig().set(path, 1);
     	}
+    	this.saveConfig();
     }
     
     private boolean hasCustomEnchant(ItemStack item, String enchantment)  {
