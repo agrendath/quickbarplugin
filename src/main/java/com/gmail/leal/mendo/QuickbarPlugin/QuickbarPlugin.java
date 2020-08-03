@@ -413,6 +413,9 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     
     @EventHandler
     public void onPlayerFoodChange(FoodLevelChangeEvent e)  {
+    	if(e.getEntity() == null || e.getItem() == null)  {
+    		return;
+    	}
     	HumanEntity entity = e.getEntity();
     	if(e.getItem().getType().equals(Material.APPLE) && entity instanceof Player)  {
     		Player player = (Player) entity;
