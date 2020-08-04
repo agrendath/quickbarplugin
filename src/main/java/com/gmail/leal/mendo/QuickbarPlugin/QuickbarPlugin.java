@@ -579,7 +579,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		sortedUuids[i] = uuid;
     		int j = i - 1;
     		int k = i;
-    		while(j >= 0 && this.getConfig().getInt(statPathPrefix + "." + sortedUuids[k]) < this.getConfig().getInt(statPathPrefix + "." + sortedUuids[j]))  {
+    		while(j >= 0 && this.getConfig().getInt(statPathPrefix + "." + sortedUuids[k]) > this.getConfig().getInt(statPathPrefix + "." + sortedUuids[j]))  {
     			QuickbarPlugin.swapInStringList(sortedUuids, k, j);
     			k--;
     			j--;
