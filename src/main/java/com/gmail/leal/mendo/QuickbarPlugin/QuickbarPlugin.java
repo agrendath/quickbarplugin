@@ -5,8 +5,13 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
@@ -121,7 +126,35 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         		}
         	}
     		else  {
-    			sender.sendMessage("You don't have permission to manipulate tiago souls");
+    			sender.sendMessage("§4You don't have permission to manipulate tiago souls");
+    			return true;
+    		}
+    	}
+    	
+    	if(cmd.getName().equalsIgnoreCase("janitatop"))  {
+    		if(!sender.hasPermission("quickbarplugin.janitatop"))  {
+    			sender.sendMessage("§4You don't have permission to view this leaderboard");
+    			return true;
+    		}
+    		else  {
+    			List<String> leaderboard = this.getLeaderboard("deaths", "Deaths");
+    			for(String message : leaderboard)  {
+    				sender.sendMessage("§5" + message);
+    			}
+    			return true;
+    		}
+    	}
+    	
+    	if(cmd.getName().equalsIgnoreCase("janita2top"))  {
+    		if(!sender.hasPermission("quickbarplugin.janita2top"))  {
+    			sender.sendMessage("§4You don't have permission to view this leaderboard");
+    			return true;
+    		}
+    		else  {
+    			List<String> leaderboard = this.getLeaderboard("applesEaten", "Apples Eaten");
+    			for(String message : leaderboard)  {
+    				sender.sendMessage("§5" + message);
+    			}
     			return true;
     		}
     	}
@@ -524,6 +557,52 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	}
     }
     
+    /**
+     * Returns a list of strings representing the leaderboard for a certain stat that the plugin tracks
+     * @param statPathPrefix The prefix to the stat's path e.g. "deaths" or "applesEaten", NOT INCLUDING THE '.'
+     * @param title The title at the top of the leaderboard
+     * @returna A list of strings representing the leaderboard for a certain stat that the plugin tracks
+     */
+    private List<String> getLeaderboard(String statPathPrefix, String title)  {
+    	List<String> result = new ArrayList<String>();
+    	result.add("---------- " + title + " Leaderboard ----------");
+    	
+    	if(this.getConfig().getConfigurationSection(statPathPrefix) == null || this.getConfig().getConfigurationSection(statPathPrefix).getKeys(false) == null)  {
+    		result.add("No players on the leaderboard yet");
+    		return result;
+    	}
+    	
+    	Set<String> keys = this.getConfig().getConfigurationSection(statPathPrefix).getKeys(false);
+    	String[] sortedUuids = new String[keys.size()];
+    	int i = 0;
+    	for(String uuid : keys)  {
+    		sortedUuids[i] = uuid;
+    		int j = i - 1;
+    		int k = i;
+    		while(j >= 0 && this.getConfig().getInt(statPathPrefix + "." + sortedUuids[k]) < this.getConfig().getInt(statPathPrefix + "." + sortedUuids[j]))  {
+    			QuickbarPlugin.swapInStringList(sortedUuids, k, j);
+    			k--;
+    			j--;
+    		}
+    		i++;
+    	}
+    	
+    	for(int x = 0; x < sortedUuids.length; x++)  {
+    		if(x > 9)  {
+    			break;
+    		}
+    		result.add((x + 1) + ". " + Bukkit.getOfflinePlayer(UUID.fromString(sortedUuids[x])).getName() + ": " + this.getConfig().getString(statPathPrefix + "." + sortedUuids[x]));
+    	}
+    	
+    	return result;
+    }
+    
+    private static void swapInStringList(String[] list, int i, int j)  {
+    	String temp = list[j];
+    	list[j] = list[i];
+    	list[i] = temp;
+    }
+    
     
     
     // Calculate amount of EXP needed to level up
@@ -647,3 +726,5 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	return item;
     }
 }
+
+

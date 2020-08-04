@@ -44,3 +44,13 @@ commands:
     usage: /soulenchant <enchantment>
     permission: quickbarplugin.soulenchant
     permission-message: You don't have permission to enchant items with tiago souls
+  janitatop:
+    description: Shows a leaderboard of the top 10 player's deaths
+    usage: /janitatop
+    permission: quickbarplugin.janitatop
+    permission-message: You don't have permission for that
+  janita2top:
+    description: Shows a leaderboard of the top 10 player's apples eaten
+    usage: /janita2top
+    permission: quickbarplugin.janita2top
+    permission-message: You don't have permission for that
