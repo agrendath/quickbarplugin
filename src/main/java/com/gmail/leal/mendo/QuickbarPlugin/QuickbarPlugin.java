@@ -31,6 +31,7 @@ import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -455,6 +456,19 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	if(e.getItem().getType().equals(Material.APPLE) && entity instanceof Player)  {
     		Player player = (Player) entity;
     		this.addAppleCount(player.getUniqueId());
+    	}
+    }
+    
+    @EventHandler
+    public void onPlayerLogIn(PlayerJoinEvent e)  {
+    	Player p = e.getPlayer();
+    	String pathApples = "applesEaten." + p.getUniqueId().toString();
+    	String pathDeaths = "deaths." + p.getUniqueId().toString();
+    	if(!this.getConfig().isSet(pathApples))  {
+    		this.getConfig().set(pathApples, 0);
+    	}
+    	if(!this.getConfig().isSet(pathDeaths))  {
+    		this.getConfig().set(pathDeaths, 0);
     	}
     }
     
