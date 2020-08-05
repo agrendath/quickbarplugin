@@ -12,7 +12,7 @@ Functionality/Commands:
 - /souls give [playername] [amount] - Give the specified amount of souls to another player (this will deduct them from your balance, obviously)
 - /soulenchant [enchantment] - Enchants the item the player is holding with a soulenchantment, see available enchantments below
 - /janitatop - Shows the leaderboard of the top 10 players with most deaths
-- /janita2top - Shows the leaderboard of the top 10 players with most appleas eaten
+- /janita2top - Shows the leaderboard of the top 10 players with most apples eaten
 
 Soul Enchantments:
 - Absorption: usable on all tools (not weapons), when you destroy blocks the drops get absorbed right into your inventory
