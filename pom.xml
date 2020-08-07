@@ -16,10 +16,6 @@
       </plugins>
    </build>
    <repositories>
-	    <repository>
-	        <id>spigot-repo</id>
-	        <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-	    </repository>
 	    <!--Bungeecord Repo-->
 	    <!--Only include if using the Spigot API dependency-->
 	    <repository>
@@ -36,5 +32,18 @@
 	           <version>1.16.1-R0.1-SNAPSHOT</version>
 	           <scope>provided</scope>
 	    </dependency>
+	    <dependency>
+		
+		    <groupId>com.gmail.nossr5</groupId>
+		
+		    <artifactId>mcMMO</artifactId>
+		
+		    <version>LATEST</version>
+		
+		    <scope>system</scope>
+		
+		    <systemPath>${basedir}/API/mcMMO.jar</systemPath>
+		
+		</dependency>
 	</dependencies>
 </project>

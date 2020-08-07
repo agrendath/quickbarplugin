@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,11 +22,13 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -38,12 +41,18 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
+import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.api.ExperienceAPI;
+import com.gmail.nossr50.datatypes.meta.BonusDropMeta;
+import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
+import com.gmail.nossr50.skills.mining.MiningManager;
+import com.gmail.nossr50.util.player.UserManager;
 
 public class QuickbarPlugin extends JavaPlugin implements Listener{
 	
@@ -441,12 +450,101 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	ItemStack item = player.getInventory().getItemInMainHand();
     	if(QuickbarPlugin.validAbsorptionTypes.contains(item.getType()) && item.getItemMeta() != null && item.getItemMeta().hasLore() && item.getItemMeta().getLore().contains(QuickbarPlugin.enchantmentAbsorption))  {
     		// The item with which the block is being broken is of a valid type and contains the absorption echantment
+    		boolean mcMMOEnabled = false;
+    		Plugin mcmmo = Bukkit.getPluginManager().getPlugin("mcMMO");
+    		mcMMO mcMMOPlugin = null;
+    		if(mcmmo != null)  {
+    			if(Bukkit.getPluginManager().isPluginEnabled(mcmmo))  {
+    				mcMMOEnabled = true;
+    				mcMMOPlugin = (mcMMO) mcmmo;
+    			}
+    		}
+    		
     		Block block = e.getBlock();
     		Collection<ItemStack> drops = block.getDrops(item, player);  // Get a list of the drops that the block should provide
     		e.setDropItems(false);  // Prevent the block from dropping items
-    		for(ItemStack i : drops)  {
-    			this.giveItem(player, i);  // Give all the drops straight to the player's inventory
+    		int bonusCount = 1;
+    		McMMOPlayer mcMMOPlayer = UserManager.getPlayer(player);
+			MiningManager mm = mcMMOPlayer.getMiningManager();
+			mm.miningBlockCheck(block.getState());
+			
+			HashSet<Material> uniqueMaterials = new HashSet<>();
+			boolean dontRewardTE = false; //If we suspect TEs are mixed in with other things don't reward bonus drops for anything that isn't a block
+			int blockCount = 0;
+			for(ItemStack itemStack : drops)  {
+				//Track unique materials
+				uniqueMaterials.add(itemStack.getType());
+				
+				// Count blocks as second failsafe
+				if(itemStack.getType().isBlock())  {
+					blockCount++;
+				}
+			}
+			
+			if(uniqueMaterials.size() > 1) {
+	            //Too many things are dropping, assume tile entities might be duped
+	            //Technically this would also prevent something like coal from being bonus dropped if you placed a TE above a coal ore when mining it but that's pretty edge case and this is a good solution for now
+	            dontRewardTE = true;
+	        }
+			
+			if(blockCount <= 1)  {
+				for(ItemStack is : drops)  {
+					if(is.getAmount() <= 0)  {
+						this.giveItem(player, is);
+						continue;
+					}
+					
+					//If we suspect TEs might be duped only reward block
+	                if(dontRewardTE) {
+	                    if(!is.getType().isBlock()) {
+	                        this.giveItem(player, is);
+	                        continue;
+	                    }
+	                }
+	                
+	                if(mcMMO.getPlaceStore().isTrue(block.getState()))  {
+	                	this.giveItem(player, is);
+	                	continue;
+	                }
+	                
+	                if (block.getMetadata(mcMMO.BONUS_DROPS_METAKEY).size() > 0) {
+	                    BonusDropMeta bonusDropMeta = (BonusDropMeta) block.getMetadata(mcMMO.BONUS_DROPS_METAKEY).get(0);
+	                    bonusCount = bonusDropMeta.asInt();
+	                    	
+	                    for (int i = 0; i < bonusCount + 1; i++) {
+	                        this.giveItem(player, is);
+	                    }
+	                }
+	                else  {
+	                	this.giveItem(player, is);
+	                }
+				}
+			}
+			
+			
+			if(block.hasMetadata(mcMMO.BONUS_DROPS_METAKEY))
+	            block.removeMetadata(mcMMO.BONUS_DROPS_METAKEY, mcMMOPlugin);
+			
+    		/**
+    		if(mcMMOEnabled && block.getMetadata(mcMMO.BONUS_DROPS_METAKEY).size() > 0)  {
+    			System.out.println("TEST2");
+    			BonusDropMeta bonusDropMeta = (BonusDropMeta) block.getMetadata(mcMMO.BONUS_DROPS_METAKEY).get(0);
+    			bonusCount = bonusDropMeta.asInt();
+    			System.out.println("Bonus drop count: " + bonusCount);
     		}
+    		for(int x = 0; x < bonusCount + 1; x++)  {
+				for(ItemStack i : drops)  {
+					this.giveItem(player, i);
+				}
+			}
+    		
+    		
+    		// removing mcmmo metadata for block
+    		if(mcMMOEnabled && block.hasMetadata(mcMMO.BONUS_DROPS_METAKEY))  {
+    			block.removeMetadata(mcMMO.BONUS_DROPS_METAKEY, mcMMOPlugin);
+    		}
+    		
+    		**/
     	}
     }
     
