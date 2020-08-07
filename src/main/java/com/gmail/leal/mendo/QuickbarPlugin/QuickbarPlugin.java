@@ -448,7 +448,6 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			e.getDrops().clear();
     		}
     		if(QuickbarPlugin.validDoublexpTypes.contains(weaponType) && this.hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
-    			System.out.println("NORMAL XP THAT THE PLAYER SHOULD RECEIVE: " + e.getDroppedExp());
     			e.setDroppedExp(e.getDroppedExp() * 2);  // Double the xp dropped
     		}
     	}
