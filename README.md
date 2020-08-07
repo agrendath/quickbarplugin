@@ -15,7 +15,7 @@ Functionality/Commands:
 - /janita2top - Shows the leaderboard of the top 10 players with most apples eaten
 
 Soul Enchantments:
-- Absorption: usable on all tools and weapons, when you destroy blocks or kill mobs/players the drops get absorbed right into your inventory
+- Magnetism: usable on all tools and weapons, when you destroy blocks or kill mobs/players the drops get absorbed right into your inventory
 - Indestructibility: usable on diamond and netherite swords, makes the item indestructible/unbreakable
 
 Permission Nodes:
