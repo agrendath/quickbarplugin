@@ -1,5 +1,6 @@
 # Quickbarplugin
 Minecraft Quickbarplugin
+
 softdepend: mcMMO [absorption enchantment works with double drops]
 
 Functionality/Commands:
