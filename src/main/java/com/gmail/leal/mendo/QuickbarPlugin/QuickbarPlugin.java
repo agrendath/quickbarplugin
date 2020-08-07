@@ -59,8 +59,10 @@ import com.gmail.nossr50.util.player.UserManager;
 public class QuickbarPlugin extends JavaPlugin implements Listener{
 	
 	private final static List<Material> validAbsorptionTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.BOW, Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD})); 
+	private final static List<Material> validDoublexpTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD}));
 	final static String ENCHANTMENT_INDESTRUCTIBILITY = "Indestructibility";
 	final static String ENCHANTMENT_ABSORPTION = "Magnetism";
+	final static String ENCHANTMENT_DOUBLEXP = "Harvesting";
 	
 	@Override
     public void onEnable() {
@@ -335,14 +337,14 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         				
         				// Item is of a valid type to be enchanted
         				if(this.getSouls(player) >= 1)  {
-        					if(player.getLevel() < 30)  {
-            					sender.sendMessage("§4You do not have enough xp, you need 1395 exp (= the first 30 levels)");
+        					if(QuickbarPlugin.getPlayerExp(player) < 1500)  {
+            					sender.sendMessage("§4You do not have enough xp, you need 1500 exp (you have " + QuickbarPlugin.getPlayerExp(player) + ")");
             					return true;
             				}
         					// Player has enough souls to make the enchantment
         					this.customEnchant(player.getInventory().getItemInMainHand(), QuickbarPlugin.ENCHANTMENT_ABSORPTION);
         					this.changeSouls(player, -1);
-        					QuickbarPlugin.takeExp(player, 1395);
+        					QuickbarPlugin.takeExp(player, 1500);
         					player.sendMessage("§5Enchantment Complete");
         				}
         				else  {
@@ -365,16 +367,36 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     					sender.sendMessage("§4You do not have enough tiago souls to perform this enchantment (1 needed)");
     					return true;
     				}
-    				if(player.getLevel() < 30)  {
-    					sender.sendMessage("§4You do not have enough xp, you need 1395 exp (= the first 30 levels)");
+    				if(QuickbarPlugin.getPlayerExp(player) < 1500)  {
+    					sender.sendMessage("§4You do not have enough xp, you need 1500 exp (you have " + QuickbarPlugin.getPlayerExp(player) + ")");
     					return true;
     				}
     				this.customEnchant(item, QuickbarPlugin.ENCHANTMENT_INDESTRUCTIBILITY);
     				this.changeSouls(player, -1);
-    				QuickbarPlugin.takeExp(player, 1395);
+    				QuickbarPlugin.takeExp(player, 1500);
     				ItemMeta meta = item.getItemMeta();
     				meta.setUnbreakable(true);
     				item.setItemMeta(meta);
+    				sender.sendMessage("§5Enchantment complete");
+    				return true;
+    			}
+    			else if(args[0].equalsIgnoreCase(QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
+    				Material type = item.getType();
+    				if(!QuickbarPlugin.validDoublexpTypes.contains(type))  {
+    					sender.sendMessage("§4Cannot apply enchantment to this type of item");
+    					return true;
+    				}
+    				if(this.getSouls(player) < 1)  {
+    					sender.sendMessage("§4You do not have enough tiago souls to perform this enchantment (1 needed)");
+    					return true;
+    				}
+    				if(QuickbarPlugin.getPlayerExp(player) < 2500)  {
+    					sender.sendMessage("§4You do not have enough xp to perform this enchantment (2500 needed, you have " + QuickbarPlugin.getPlayerExp(player) + ")");
+    					return true;
+    				}
+    				this.customEnchant(item, QuickbarPlugin.ENCHANTMENT_DOUBLEXP);
+    				this.changeSouls(player, -1);
+    				QuickbarPlugin.takeExp(player, 2500);
     				sender.sendMessage("§5Enchantment complete");
     				return true;
     			}
@@ -424,6 +446,10 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     				this.giveItem(killer, is);
     			}
     			e.getDrops().clear();
+    		}
+    		if(QuickbarPlugin.validDoublexpTypes.contains(weaponType) && this.hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
+    			System.out.println("NORMAL XP THAT THE PLAYER SHOULD RECEIVE: " + e.getDroppedExp());
+    			e.setDroppedExp(e.getDroppedExp() * 2);  // Double the xp dropped
     		}
     	}
     }
