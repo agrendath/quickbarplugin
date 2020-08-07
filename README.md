@@ -1,5 +1,6 @@
 # Quickbarplugin
 Minecraft Quickbarplugin
+softdepend: mcMMO [absorption enchantment works with double drops]
 
 Functionality/Commands:
 - /emma - Gives the player a special tool that lets you switch your quickbar with the first line of your inventory by right-clicking
