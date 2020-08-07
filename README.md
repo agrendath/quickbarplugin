@@ -17,6 +17,12 @@ Functionality/Commands:
 Soul Enchantments:
 - Magnetism: usable on all tools and weapons, when you destroy blocks or kill mobs/players the drops get absorbed right into your inventory
 - Indestructibility: usable on diamond and netherite swords, makes the item indestructible/unbreakable
+- Harvesting: usable on all swords and bows, will drop double xp from any entity you kill
+
+Soul Enchantments Costs:
+- Magnetism: 1 Tiago Soul and 1500 xp
+- Indestructibility: 1 Tiago Soul and 1500 xp
+- Harvesting: 1 Tiago Soul and 2500 xp
 
 Permission Nodes:
 - quickbarplugin.tiago: Grants access to the /tiago command
