@@ -23,6 +23,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,6 +31,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -56,9 +58,9 @@ import com.gmail.nossr50.util.player.UserManager;
 
 public class QuickbarPlugin extends JavaPlugin implements Listener{
 	
-	final static List<Material> validAbsorptionTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE})); 
-	final static String enchantmentIndestructibility = "Indestructibility";
-	final static String enchantmentAbsorption = "Absorption";
+	private final static List<Material> validAbsorptionTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.BOW, Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD})); 
+	final static String ENCHANTMENT_INDESTRUCTIBILITY = "Indestructibility";
+	final static String ENCHANTMENT_ABSORPTION = "Absorption";
 	
 	@Override
     public void onEnable() {
@@ -181,7 +183,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         			return false;
         		}
         		else {
-        			if(Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && isInConfig(args[0]))  {
+        			if(Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && isInConfig(args[0], "deaths."))  {
         				sender.sendMessage("§d" + args[0].substring(0, 1).toUpperCase() + args[0].substring(1) + " has died " + this.getConfig().getString("deaths." + Bukkit.getOfflinePlayer(args[0]).getUniqueId().toString()) + " time(s)");
         			}
         			else  {
@@ -321,12 +323,12 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			
     			Player player = (Player)sender;
     			ItemStack item = player.getInventory().getItemInMainHand();
-    			if(args[0].equalsIgnoreCase(QuickbarPlugin.enchantmentAbsorption))  {
+    			if(args[0].equalsIgnoreCase(QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
         			Material type = item.getType();
         			List<Material> validTypes = QuickbarPlugin.validAbsorptionTypes;
         			
         			if(validTypes.contains(type))  {
-        				if(this.hasCustomEnchant(item, QuickbarPlugin.enchantmentAbsorption))  {
+        				if(this.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
             				sender.sendMessage("§4This item already has the given enchantment");
             				return true;
             			}
@@ -338,7 +340,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
             					return true;
             				}
         					// Player has enough souls to make the enchantment
-        					this.customEnchant(player.getInventory().getItemInMainHand(), QuickbarPlugin.enchantmentAbsorption);
+        					this.customEnchant(player.getInventory().getItemInMainHand(), QuickbarPlugin.ENCHANTMENT_ABSORPTION);
         					this.changeSouls(player, -1);
         					QuickbarPlugin.takeExp(player, 1395);
         					player.sendMessage("§5Enchantment Complete");
@@ -353,7 +355,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         				return true;
         			}
     			}
-    			else if(args[0].equalsIgnoreCase(QuickbarPlugin.enchantmentIndestructibility))  {
+    			else if(args[0].equalsIgnoreCase(QuickbarPlugin.ENCHANTMENT_INDESTRUCTIBILITY))  {
     				Material type = item.getType();
     				if(!(type.equals(Material.DIAMOND_SWORD) || type.equals(Material.NETHERITE_SWORD)))  {
     					sender.sendMessage("§4This enchantment can only be applied to diamond or netherite swords");
@@ -367,7 +369,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     					sender.sendMessage("§4You do not have enough xp, you need 1395 exp (= the first 30 levels)");
     					return true;
     				}
-    				this.customEnchant(item, QuickbarPlugin.enchantmentIndestructibility);
+    				this.customEnchant(item, QuickbarPlugin.ENCHANTMENT_INDESTRUCTIBILITY);
     				this.changeSouls(player, -1);
     				QuickbarPlugin.takeExp(player, 1395);
     				ItemMeta meta = item.getItemMeta();
@@ -410,6 +412,23 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     }
     
     @EventHandler
+    public void onEntityKill(EntityDeathEvent e)  {
+    	LivingEntity killed = e.getEntity();
+    	if(killed.getKiller() != null)  {
+    		Player killer = (Player) killed.getKiller();
+    		ItemStack murderWeapon = killer.getInventory().getItemInMainHand();
+    		Material weaponType = murderWeapon.getType();
+    		if(QuickbarPlugin.validAbsorptionTypes.contains(weaponType) && this.hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
+    			Collection<ItemStack> drops = e.getDrops();
+    			for(ItemStack is : drops)  {
+    				this.giveItem(killer, is);
+    			}
+    			e.getDrops().clear();
+    		}
+    	}
+    }
+    
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e)  {
     	//getLogger().info("PlayerInteract even triggered...");
     	if(e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK))  {
@@ -433,7 +452,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     public void onDeath(PlayerDeathEvent e)  {
     	Player player = (Player) e.getEntity();
     	if(player instanceof Player)  {
-    		if(isInConfig(player.getName()))  { // Add death to config
+    		if(isInConfig(player.getName(), "deaths."))  { // Add death to config
     			this.getConfig().set("deaths." + player.getUniqueId(), this.getConfig().getInt("deaths." + player.getUniqueId()) + 1);
     			saveConfig();
     		}
@@ -448,7 +467,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     public void onBlockBreak(BlockBreakEvent e)  {
     	Player player = e.getPlayer();
     	ItemStack item = player.getInventory().getItemInMainHand();
-    	if(QuickbarPlugin.validAbsorptionTypes.contains(item.getType()) && item.getItemMeta() != null && item.getItemMeta().hasLore() && item.getItemMeta().getLore().contains(QuickbarPlugin.enchantmentAbsorption))  {
+    	if(QuickbarPlugin.validAbsorptionTypes.contains(item.getType()) && this.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
     		// The item with which the block is being broken is of a valid type and contains the absorption echantment
     		boolean mcMMOEnabled = false;
     		Plugin mcmmo = Bukkit.getPluginManager().getPlugin("mcMMO");
@@ -464,6 +483,15 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		Collection<ItemStack> drops = block.getDrops(item, player);  // Get a list of the drops that the block should provide
     		e.setDropItems(false);  // Prevent the block from dropping items
     		int bonusCount = 1;
+    		
+    		if(!mcMMOEnabled)  {
+    			for(ItemStack is : drops)  {
+    				this.giveItem(player, is);
+    			}
+    			return;
+    		}
+    		
+    		// This code only runs if mcMMO is enabled
     		McMMOPlayer mcMMOPlayer = UserManager.getPlayer(player);
 			MiningManager mm = mcMMOPlayer.getMiningManager();
 			mm.miningBlockCheck(block.getState());
@@ -524,27 +552,6 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
 			
 			if(block.hasMetadata(mcMMO.BONUS_DROPS_METAKEY))
 	            block.removeMetadata(mcMMO.BONUS_DROPS_METAKEY, mcMMOPlugin);
-			
-    		/**
-    		if(mcMMOEnabled && block.getMetadata(mcMMO.BONUS_DROPS_METAKEY).size() > 0)  {
-    			System.out.println("TEST2");
-    			BonusDropMeta bonusDropMeta = (BonusDropMeta) block.getMetadata(mcMMO.BONUS_DROPS_METAKEY).get(0);
-    			bonusCount = bonusDropMeta.asInt();
-    			System.out.println("Bonus drop count: " + bonusCount);
-    		}
-    		for(int x = 0; x < bonusCount + 1; x++)  {
-				for(ItemStack i : drops)  {
-					this.giveItem(player, i);
-				}
-			}
-    		
-    		
-    		// removing mcmmo metadata for block
-    		if(mcMMOEnabled && block.hasMetadata(mcMMO.BONUS_DROPS_METAKEY))  {
-    			block.removeMetadata(mcMMO.BONUS_DROPS_METAKEY, mcMMOPlugin);
-    		}
-    		
-    		**/
     	}
     }
     
@@ -812,8 +819,14 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	}
     }
     
-    private boolean isInConfig(String player)  {
-    	if(this.getConfig().isSet("deaths." + Bukkit.getOfflinePlayer(player).getUniqueId()))  {
+    /**
+     * Checks if the player is in the config file for the certain property
+     * @param player The player
+     * @param pathPrefix the prefix to the path of the proprty including the '.', e.g. "deaths." or "applesEaten."
+     * @return true if the player has a value set for this property in the config file, false otherwise
+     */
+    private boolean isInConfig(String player, String pathPrefix)  {
+    	if(this.getConfig().isSet(pathPrefix + Bukkit.getOfflinePlayer(player).getUniqueId()))  {
     		return true;
     	}
     	else  {

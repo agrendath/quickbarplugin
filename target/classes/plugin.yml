@@ -3,7 +3,7 @@ main: com.gmail.leal.mendo.QuickbarPlugin.QuickbarPlugin
 version: 1.0
 author: agrendath
 api-version: 1.16
-depend: [mcMMO]
+softdepend: [mcMMO]
 commands:
   tiago:
     description: Returns useful information about tiago
