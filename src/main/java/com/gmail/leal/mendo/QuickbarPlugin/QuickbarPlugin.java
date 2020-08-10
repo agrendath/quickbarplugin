@@ -17,8 +17,10 @@ import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -492,6 +494,52 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     public void onBlockBreak(BlockBreakEvent e)  {
     	Player player = e.getPlayer();
     	ItemStack item = player.getInventory().getItemInMainHand();
+    	if(e.getBlock().getType().equals(Material.CARVED_PUMPKIN))  {
+    		boolean diamondBlocks = false;
+    		boolean emeraldBlocks = false;
+    		Location blockLocation = e.getBlock().getLocation();
+    		int x = blockLocation.getBlockX();
+    		int y = blockLocation.getBlockY();
+    		int z = blockLocation.getBlockZ();
+    		World world = Bukkit.getWorld("world");
+    		Block topDiamond = world.getBlockAt(x, y - 1, z);
+    		Block bottomDiamond = world.getBlockAt(x, y - 2, z);
+    		Block emerald1X = null;
+    		Block emerald2X = null;
+    		boolean emeraldAlongXAxis = false;
+    		if(topDiamond != null && bottomDiamond != null && topDiamond.getType().equals(Material.DIAMOND_BLOCK) && topDiamond.getType().equals(Material.DIAMOND_BLOCK))  {
+    			diamondBlocks = true;
+    		}
+    		Block emerald1Z = world.getBlockAt(x, y - 1, z + 1);
+    		Block emerald2Z = world.getBlockAt(x, y - 1, z - 1);
+    		if(emerald1Z != null && emerald2Z != null && emerald1Z.getType().equals(Material.EMERALD_BLOCK) && emerald2Z.getType().equals(Material.EMERALD_BLOCK))  {
+    			emeraldBlocks = true;
+    		}
+    		else {
+    			emerald1X = world.getBlockAt(x + 1, y - 1, z);
+    			emerald2X = world.getBlockAt(x - 1, y - 1, z);
+    			if(emerald1X != null && emerald2X != null && emerald1X.getType().equals(Material.EMERALD_BLOCK) && emerald2X.getType().equals(Material.EMERALD_BLOCK))  {
+    				emeraldBlocks = true;
+    				emeraldAlongXAxis = true;
+    			}
+    		}
+    		if(diamondBlocks && emeraldBlocks)  {
+    			topDiamond.setType(Material.AIR);
+    			bottomDiamond.setType(Material.AIR);
+    			if(emeraldAlongXAxis)  {
+    				emerald1X.setType(Material.AIR);
+    				emerald2X.setType(Material.AIR);
+    			}
+    			else  {
+    				emerald1Z.setType(Material.AIR);
+    				emerald2Z.setType(Material.AIR);
+    			}
+    			world.createExplosion(x, y, z, 3F, false, false);
+    			this.changeSouls(player, 1);
+    			player.sendMessage("§6Congratulations! You have obtained a Tiago Soul by destroying his majestic statue.");
+    		}
+    	}
+    	
     	if(QuickbarPlugin.validAbsorptionTypes.contains(item.getType()) && this.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
     		// The item with which the block is being broken is of a valid type and contains the absorption echantment
     		boolean mcMMOEnabled = false;
