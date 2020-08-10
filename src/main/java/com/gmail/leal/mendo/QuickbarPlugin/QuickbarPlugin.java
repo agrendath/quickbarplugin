@@ -62,9 +62,11 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
 	
 	private final static List<Material> validAbsorptionTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.BOW, Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD})); 
 	private final static List<Material> validDoublexpTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.BOW, Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD})); 
-	final static String ENCHANTMENT_INDESTRUCTIBILITY = "Indestructibility";
-	final static String ENCHANTMENT_ABSORPTION = "Magnetism";
-	final static String ENCHANTMENT_DOUBLEXP = "Harvesting";
+	private final static List<Material> validVampirismTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD, Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.BOW}));
+	private final static String ENCHANTMENT_INDESTRUCTIBILITY = "Indestructibility";
+	private final static String ENCHANTMENT_ABSORPTION = "Magnetism";
+	private final static String ENCHANTMENT_DOUBLEXP = "Harvesting";
+	private final static String ENCHANTMENT_VAMPIRISM = "Vampirism";
 	
 	@Override
     public void onEnable() {
@@ -332,7 +334,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         			List<Material> validTypes = QuickbarPlugin.validAbsorptionTypes;
         			
         			if(validTypes.contains(type))  {
-        				if(this.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
+        				if(hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
             				sender.sendMessage("§4This item already has the given enchantment");
             				return true;
             			}
@@ -402,6 +404,27 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     				sender.sendMessage("§5Enchantment complete");
     				return true;
     			}
+    			else if(args[0].equalsIgnoreCase(QuickbarPlugin.ENCHANTMENT_VAMPIRISM))  {
+    				Material type = item.getType();
+    				if(!QuickbarPlugin.validVampirismTypes.contains(type))  {
+    					sender.sendMessage("§4Cannot apply enchantment to this type of item");
+    					return true;
+    				}
+    				if(this.getSouls(player) < 1)  {
+    					sender.sendMessage("§4You do not have enough tiago souls to perform this enchantment (1 needed)");
+    					return true;
+    				}
+    				if(QuickbarPlugin.getPlayerExp(player) < 3000)  {
+    					sender.sendMessage("§4You do not have enough xp to perform this enchantment (3000 needed, you have " + QuickbarPlugin.getPlayerExp(player) + ")");
+    					return true;
+    				}
+    				this.customEnchant(item, QuickbarPlugin.ENCHANTMENT_VAMPIRISM);
+    				this.changeSouls(player, -1);
+    				QuickbarPlugin.takeExp(player, 3000);
+    				sender.sendMessage("§5Enchantment complete");
+    				return true;
+    				
+    			}
     			else  {
     				sender.sendMessage("§4Invalid enchantment");
     				return true;
@@ -442,14 +465,14 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		Player killer = (Player) killed.getKiller();
     		ItemStack murderWeapon = killer.getInventory().getItemInMainHand();
     		Material weaponType = murderWeapon.getType();
-    		if(QuickbarPlugin.validAbsorptionTypes.contains(weaponType) && this.hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
+    		if(QuickbarPlugin.validAbsorptionTypes.contains(weaponType) && hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
     			Collection<ItemStack> drops = e.getDrops();
     			for(ItemStack is : drops)  {
     				this.giveItem(killer, is);
     			}
     			e.getDrops().clear();
     		}
-    		if(QuickbarPlugin.validDoublexpTypes.contains(weaponType) && this.hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
+    		if(QuickbarPlugin.validDoublexpTypes.contains(weaponType) && hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
     			e.setDroppedExp(e.getDroppedExp() * 2);  // Double the xp dropped
     		}
     	}
@@ -540,7 +563,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		}
     	}
     	
-    	if(QuickbarPlugin.validAbsorptionTypes.contains(item.getType()) && this.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
+    	if(QuickbarPlugin.validAbsorptionTypes.contains(item.getType()) && hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
     		// The item with which the block is being broken is of a valid type and contains the absorption echantment
     		boolean mcMMOEnabled = false;
     		Plugin mcmmo = Bukkit.getPluginManager().getPlugin("mcMMO");
@@ -627,7 +650,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
 	            block.removeMetadata(mcMMO.BONUS_DROPS_METAKEY, mcMMOPlugin);
     	}
     	
-    	if(QuickbarPlugin.validDoublexpTypes.contains(item.getType()) && this.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
+    	if(QuickbarPlugin.validDoublexpTypes.contains(item.getType()) && hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
     		e.setExpToDrop(e.getExpToDrop() * 2);
     	}
     }
@@ -657,12 +680,26 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	}
     }
     
+    @EventHandler
+    public void onDamage(EntityDamageByEntityEvent e)  {
+    	Entity damagerEntity = e.getDamager();
+    	if(damagerEntity instanceof Player)  {
+    		Player damager = (Player) damagerEntity;
+    		ItemStack item = damager.getInventory().getItemInMainHand();
+    		if(QuickbarPlugin.validVampirismTypes.contains(item.getType()) && hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_VAMPIRISM))  {
+    			// Item has the enchantment vampirism
+    			// heal for 20 % of damage dealt
+    			damager.setHealth(damager.getHealth() + 0.2*e.getDamage());
+    		}
+    	}
+    }
+    
     /**
      * @pre The given enchantment is valid for the given item, must be checked beforehand
      */
     private void customEnchant(ItemStack item, String enchantment) {
     	ItemMeta meta = item.getItemMeta();
-    	if(this.hasCustomEnchant(item, enchantment) || meta == null)  {
+    	if(hasCustomEnchant(item, enchantment) || meta == null)  {
     		return;
     	}
     	List<String> newLore = null;
@@ -688,7 +725,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	this.saveConfig();
     }
     
-    private boolean hasCustomEnchant(ItemStack item, String enchantment)  {
+    private static boolean hasCustomEnchant(ItemStack item, String enchantment)  {
     	ItemMeta meta = item.getItemMeta();
     	List<String> lore = meta.getLore();
     	if(meta != null && lore != null && lore.contains(enchantment))  {
