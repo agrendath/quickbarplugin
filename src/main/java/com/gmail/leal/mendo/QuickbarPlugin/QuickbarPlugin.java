@@ -1,21 +1,13 @@
 package com.gmail.leal.mendo.QuickbarPlugin;
 
-import java.io.ByteArrayOutputStream;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,14 +16,12 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
@@ -47,14 +37,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.io.BukkitObjectOutputStream;
-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import com.gmail.nossr50.mcMMO;
-import com.gmail.nossr50.api.ExperienceAPI;
 import com.gmail.nossr50.datatypes.meta.BonusDropMeta;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
-import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.skills.mining.MiningManager;
 import com.gmail.nossr50.util.player.UserManager;
 
@@ -155,15 +141,14 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	if(cmd.getName().equalsIgnoreCase("janitatop"))  {
     		if(!sender.hasPermission("quickbarplugin.janitatop"))  {
     			sender.sendMessage("§4You don't have permission to view this leaderboard");
-    			return true;
     		}
     		else  {
-    			List<String> leaderboard = this.getLeaderboard("deaths", "Deaths");
-    			for(String message : leaderboard)  {
-    				sender.sendMessage("§5" + message);
-    			}
-    			return true;
-    		}
+				List<String> leaderboard = this.getLeaderboard("deaths", "Deaths");
+				for(String message : leaderboard)  {
+					sender.sendMessage("§5" + message);
+				}
+			}
+			return true;
     	}
     	
     	if(cmd.getName().equalsIgnoreCase("janita2top"))  {
@@ -287,9 +272,9 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     					//Inventory inv = p.getInventory();
     					
     					// Check if the player has enough xp to get the required amount of bottles
-    					if(xpAmount > getPlayerExp(p))  {
+    					if(xpAmount > XPUtil.getPlayerExp(p))  {
     						// Get maximum amount of bottles you can get
-    						xpAmount = getPlayerExp(p);
+    						xpAmount = XPUtil.getPlayerExp(p);
     						amount = (int) Math.floor(xpAmount/100);
     					}
     					int extraAmount = xpAmount%100;
@@ -307,8 +292,8 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
 							giveItem(p, new ItemStack(Material.EXPERIENCE_BOTTLE, amount));
 						}
     					
-    					takeExp(p, xpAmount);
-    					takeExp(p, -extraAmount);
+    					XPUtil.takeExp(p, xpAmount);
+    					XPUtil.takeExp(p, -extraAmount);
     					return true;
     				}
     			}
@@ -341,14 +326,14 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         				
         				// Item is of a valid type to be enchanted
         				if(this.getSouls(player) >= 1)  {
-        					if(QuickbarPlugin.getPlayerExp(player) < 1500)  {
-            					sender.sendMessage("§4You do not have enough xp, you need 1500 exp (you have " + QuickbarPlugin.getPlayerExp(player) + ")");
+        					if(XPUtil.getPlayerExp(player) < 1500)  {
+            					sender.sendMessage("§4You do not have enough xp, you need 1500 exp (you have " + XPUtil.getPlayerExp(player) + ")");
             					return true;
             				}
         					// Player has enough souls to make the enchantment
         					this.customEnchant(player.getInventory().getItemInMainHand(), QuickbarPlugin.ENCHANTMENT_ABSORPTION);
         					this.changeSouls(player, -1);
-        					QuickbarPlugin.takeExp(player, 1500);
+        					XPUtil.takeExp(player, 1500);
         					player.sendMessage("§5Enchantment Complete");
         				}
         				else  {
@@ -371,13 +356,13 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     					sender.sendMessage("§4You do not have enough tiago souls to perform this enchantment (1 needed)");
     					return true;
     				}
-    				if(QuickbarPlugin.getPlayerExp(player) < 1500)  {
-    					sender.sendMessage("§4You do not have enough xp, you need 1500 exp (you have " + QuickbarPlugin.getPlayerExp(player) + ")");
+    				if(XPUtil.getPlayerExp(player) < 1500)  {
+    					sender.sendMessage("§4You do not have enough xp, you need 1500 exp (you have " + XPUtil.getPlayerExp(player) + ")");
     					return true;
     				}
     				this.customEnchant(item, QuickbarPlugin.ENCHANTMENT_INDESTRUCTIBILITY);
     				this.changeSouls(player, -1);
-    				QuickbarPlugin.takeExp(player, 1500);
+    				XPUtil.takeExp(player, 1500);
     				ItemMeta meta = item.getItemMeta();
     				meta.setUnbreakable(true);
     				item.setItemMeta(meta);
@@ -394,13 +379,13 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     					sender.sendMessage("§4You do not have enough tiago souls to perform this enchantment (1 needed)");
     					return true;
     				}
-    				if(QuickbarPlugin.getPlayerExp(player) < 2500)  {
-    					sender.sendMessage("§4You do not have enough xp to perform this enchantment (2500 needed, you have " + QuickbarPlugin.getPlayerExp(player) + ")");
+    				if(XPUtil.getPlayerExp(player) < 2500)  {
+    					sender.sendMessage("§4You do not have enough xp to perform this enchantment (2500 needed, you have " + XPUtil.getPlayerExp(player) + ")");
     					return true;
     				}
     				this.customEnchant(item, QuickbarPlugin.ENCHANTMENT_DOUBLEXP);
     				this.changeSouls(player, -1);
-    				QuickbarPlugin.takeExp(player, 2500);
+    				XPUtil.takeExp(player, 2500);
     				sender.sendMessage("§5Enchantment complete");
     				return true;
     			}
@@ -414,13 +399,13 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     					sender.sendMessage("§4You do not have enough tiago souls to perform this enchantment (1 needed)");
     					return true;
     				}
-    				if(QuickbarPlugin.getPlayerExp(player) < 3000)  {
-    					sender.sendMessage("§4You do not have enough xp to perform this enchantment (3000 needed, you have " + QuickbarPlugin.getPlayerExp(player) + ")");
+    				if(XPUtil.getPlayerExp(player) < 3000)  {
+    					sender.sendMessage("§4You do not have enough xp to perform this enchantment (3000 needed, you have " + XPUtil.getPlayerExp(player) + ")");
     					return true;
     				}
     				this.customEnchant(item, QuickbarPlugin.ENCHANTMENT_VAMPIRISM);
     				this.changeSouls(player, -1);
-    				QuickbarPlugin.takeExp(player, 3000);
+    				XPUtil.takeExp(player, 3000);
     				sender.sendMessage("§5Enchantment complete");
     				return true;
     				
@@ -837,61 +822,6 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	String temp = list[j];
     	list[j] = list[i];
     	list[i] = temp;
-    }
-    
-    
-    
-    // Calculate amount of EXP needed to level up
-    public static int getExpToLevelUp(int level)  {
-    	if(level <= 15)  {
-    		return 2*level+7;
-    	} else if(level <= 30)  {
-    		return 5*level-38;
-    	}  else  {
-    		return 9*level-158;
-    	}
-    }
-    
-    // Calculate total experience up to a level
-    public static int getExpAtLevel(int level)  {
-    	if(level <= 16)  {
-    		return (int) (Math.pow(level, 2) + 6*level);
-    	}  else if(level <= 31)  {
-    		return (int) (2.5*Math.pow(level, 2) - 40.5*level + 360.0);
-    	} else  {
-    		return (int) (4.5*Math.pow(level, 2) - 162.5*level + 2200.0);
-    	}
-    }
-    
-    // Calculate the player's current EXP amount
-    public static int getPlayerExp(Player player)  {
-    	int exp = 0;
-    	int level = player.getLevel();
-    	
-    	// Get amount of XP in past levels
-    	exp += getExpAtLevel(level);
-    	
-    	// Get amount of XP towards next level
-    	exp += Math.round(getExpToLevelUp(level) * player.getExp());
-    	
-    	return exp;
-    }
-    
-    // Take from player's exp
-    public static int takeExp(Player player, int exp)  {
-    	// Get player's current exp
-    	int currentExp = getPlayerExp(player);
-    	
-    	// Reset player's current exp to 0
-    	player.setExp(0);
-    	player.setLevel(0);
-    	
-    	// Give the player their exp back, with the difference
-    	int newExp = currentExp - exp;
-    	player.giveExp(newExp);
-    	
-    	// Return the player's new exp amount
-    	return newExp;
     }
     
     
