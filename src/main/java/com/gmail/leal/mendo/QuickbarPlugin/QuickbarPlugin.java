@@ -47,21 +47,20 @@ import com.gmail.nossr50.util.player.UserManager;
 
 public class QuickbarPlugin extends JavaPlugin implements Listener{
 	
-	private final static List<Material> validAbsorptionTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.BOW, Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD})); 
-	private final static List<Material> validDoublexpTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.BOW, Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD})); 
-	private final static List<Material> validVampirismTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD, Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.BOW}));
-	private final static String ENCHANTMENT_INDESTRUCTIBILITY = "Indestructibility";
-	private final static String ENCHANTMENT_ABSORPTION = "Magnetism";
-	private final static String ENCHANTMENT_DOUBLEXP = "Harvesting";
-	private final static String ENCHANTMENT_VAMPIRISM = "Vampirism";
+	public final static List<Material> validAbsorptionTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.BOW, Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD})); 
+	public final static List<Material> validDoublexpTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.BOW, Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD})); 
+	public final static List<Material> validVampirismTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD, Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.BOW}));
+	public final static String ENCHANTMENT_INDESTRUCTIBILITY = "Indestructibility";
+	public final static String ENCHANTMENT_ABSORPTION = "Magnetism";
+	public final static String ENCHANTMENT_DOUBLEXP = "Harvesting";
+	public final static String ENCHANTMENT_VAMPIRISM = "Vampirism";
 	
 	@Override
     public void onEnable() {
         // TODO Insert logic to be performed when the plugin is enabled
 		getLogger().info("Launching QuickbarPlugin...");
-		Bukkit.getPluginManager().registerEvents(this,  this);
+		Bukkit.getPluginManager().registerEvents(new Listeners(this),  this);
 		this.saveDefaultConfig(); // Create config file if it doesn't exist already
-		
 		reloadConfig();
 		
 		// in case of /reload used and storage about players in a hashmap or PlayerJoinEvent
@@ -144,7 +143,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			sender.sendMessage("§4You don't have permission to view this leaderboard");
     		}
     		else  {
-				List<String> leaderboard = this.getLeaderboard("deaths", "Deaths");
+				List<String> leaderboard = Trackers.getLeaderboard("deaths", "Deaths", this.getConfig());
 				for(String message : leaderboard)  {
 					sender.sendMessage("§5" + message);
 				}
@@ -158,7 +157,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			return true;
     		}
     		else  {
-    			List<String> leaderboard = this.getLeaderboard("applesEaten", "Apples Eaten");
+    			List<String> leaderboard = Trackers.getLeaderboard("applesEaten", "Apples Eaten", this.getConfig());
     			for(String message : leaderboard)  {
     				sender.sendMessage("§5" + message);
     			}
@@ -175,7 +174,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         			return false;
         		}
         		else {
-        			if(Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && isInConfig(args[0], "deaths.", this.getConfig()))  {
+        			if(Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && GeneralUtil.isInConfig(args[0], "deaths.", this.getConfig()))  {
         				sender.sendMessage("§d" + args[0].substring(0, 1).toUpperCase() + args[0].substring(1) + " has died " + this.getConfig().getString("deaths." + Bukkit.getOfflinePlayer(args[0]).getUniqueId().toString()) + " time(s)");
         			}
         			else  {
@@ -248,7 +247,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			Player player = (Player) sender;
     			// give the quickbar switching tool
     			PlayerInventory inventory = player.getInventory();
-    			inventory.addItem(qbs());
+    			inventory.addItem(QuickbarSwitcher.getQbs());
     			return true;
     		}
     		else  {
@@ -266,7 +265,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     				return false;
     			}
     			else  {
-    				if(isInteger(args[0]))  {
+    				if(GeneralUtil.isInteger(args[0]))  {
     					int amount = Integer.parseInt(args[0]);
     					int xpAmount = amount*100;
     					Player p = (Player) sender;
@@ -285,12 +284,12 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
 							int stacks = (int) Math.floor(amount/64);
 							int remainder = amount%64;
 							for(int n = 0; n < stacks; n++)  {
-								giveItem(p, new ItemStack(Material.EXPERIENCE_BOTTLE, 64));
+								GeneralUtil.giveItem(p, new ItemStack(Material.EXPERIENCE_BOTTLE, 64));
 							}
-							giveItem(p, new ItemStack(Material.EXPERIENCE_BOTTLE, remainder));
+							GeneralUtil.giveItem(p, new ItemStack(Material.EXPERIENCE_BOTTLE, remainder));
 						}
 						else  {
-							giveItem(p, new ItemStack(Material.EXPERIENCE_BOTTLE, amount));
+							GeneralUtil.giveItem(p, new ItemStack(Material.EXPERIENCE_BOTTLE, amount));
 						}
     					
     					XPUtil.takeExp(p, xpAmount);
@@ -425,399 +424,6 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	// If this has happened the function will return true. 
         // If this hasn't happened the value of false will be returned.
     	return false; 
-    }
-    
-    @EventHandler
-    public void onKill(PlayerDeathEvent e)  {
-    	Player killed = e.getEntity();
-    	Player killer = killed.getKiller();
-    	if(killed.getUniqueId().toString().equals("b2a75ec7-c556-4f47-8b61-bfb1780b4ac5")) {  // killing tiago
-    		killer.sendMessage("§6Congratulations! You have obtained a §5Tiago Soul");
-    		SoulEnchantments.changeSouls(killer, 1, this);
-    	}
-    	else if(killed.getUniqueId().toString().equals("df736569-ffed-40e7-9c92-074661b86b09"))  {  // killing lucas (10% chance of tiago soul)
-    		int random = (int) (Math.random() * 10 + 1);  // random int in interval [0, 9] (inclusive)
-    		if(random == 0)  {
-    			killer.sendMessage("§6Congratulations! You have obtained a §5Tiago Soul");
-    			SoulEnchantments.changeSouls(killer, 1, this);
-    		}
-    	}
-    }
-    
-    @EventHandler
-    public void onEntityKill(EntityDeathEvent e)  {
-    	LivingEntity killed = e.getEntity();
-    	if(killed.getKiller() != null)  {
-    		Player killer = (Player) killed.getKiller();
-    		ItemStack murderWeapon = killer.getInventory().getItemInMainHand();
-    		Material weaponType = murderWeapon.getType();
-    		if(QuickbarPlugin.validAbsorptionTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
-    			Collection<ItemStack> drops = e.getDrops();
-    			for(ItemStack is : drops)  {
-    				this.giveItem(killer, is);
-    			}
-    			e.getDrops().clear();
-    		}
-    		if(QuickbarPlugin.validDoublexpTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
-    			e.setDroppedExp(e.getDroppedExp() * 2);  // Double the xp dropped
-    		}
-    	}
-    }
-    
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent e)  {
-    	//getLogger().info("PlayerInteract even triggered...");
-    	if(e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK))  {
-    		Player player = e.getPlayer();
-    		if(e.getItem() != null)  {
-    			if(e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase("Quickbar Switcher"))  {
-        			// Switch Quickbar
-        			switchItems(player);
-        			
-        		}
-    		}
-    	}
-    }
-    
-    @EventHandler
-    public void onExpBottle(ExpBottleEvent e)  {
-    	e.setExperience(100);
-    }
-    
-    @EventHandler
-    public void onDeath(PlayerDeathEvent e)  {
-    	Player player = (Player) e.getEntity();
-    	if(player instanceof Player)  {
-    		if(isInConfig(player.getName(), "deaths.", this.getConfig()))  { // Add death to config
-    			this.getConfig().set("deaths." + player.getUniqueId(), this.getConfig().getInt("deaths." + player.getUniqueId()) + 1);
-    			saveConfig();
-    		}
-    		else  { // Create new entry for player, then add death to config
-    			this.getConfig().set("deaths." + player.getUniqueId(), 1);
-    			saveConfig();
-    		}
-    	}
-    }
-    
-    @EventHandler
-    public void onBlockBreak(BlockBreakEvent e)  {
-    	Player player = e.getPlayer();
-    	ItemStack item = player.getInventory().getItemInMainHand();
-    	if(e.getBlock().getType().equals(Material.CARVED_PUMPKIN))  {
-    		boolean diamondBlocks = false;
-    		boolean emeraldBlocks = false;
-    		Location blockLocation = e.getBlock().getLocation();
-    		int x = blockLocation.getBlockX();
-    		int y = blockLocation.getBlockY();
-    		int z = blockLocation.getBlockZ();
-    		World world = Bukkit.getWorld("world");
-    		Block topDiamond = world.getBlockAt(x, y - 1, z);
-    		Block bottomDiamond = world.getBlockAt(x, y - 2, z);
-    		Block emerald1X = null;
-    		Block emerald2X = null;
-    		boolean emeraldAlongXAxis = false;
-    		if(topDiamond != null && bottomDiamond != null && topDiamond.getType().equals(Material.DIAMOND_BLOCK) && topDiamond.getType().equals(Material.DIAMOND_BLOCK))  {
-    			diamondBlocks = true;
-    		}
-    		Block emerald1Z = world.getBlockAt(x, y - 1, z + 1);
-    		Block emerald2Z = world.getBlockAt(x, y - 1, z - 1);
-    		if(emerald1Z != null && emerald2Z != null && emerald1Z.getType().equals(Material.EMERALD_BLOCK) && emerald2Z.getType().equals(Material.EMERALD_BLOCK))  {
-    			emeraldBlocks = true;
-    		}
-    		else {
-    			emerald1X = world.getBlockAt(x + 1, y - 1, z);
-    			emerald2X = world.getBlockAt(x - 1, y - 1, z);
-    			if(emerald1X != null && emerald2X != null && emerald1X.getType().equals(Material.EMERALD_BLOCK) && emerald2X.getType().equals(Material.EMERALD_BLOCK))  {
-    				emeraldBlocks = true;
-    				emeraldAlongXAxis = true;
-    			}
-    		}
-    		if(diamondBlocks && emeraldBlocks)  {
-    			topDiamond.setType(Material.AIR);
-    			bottomDiamond.setType(Material.AIR);
-    			if(emeraldAlongXAxis)  {
-    				emerald1X.setType(Material.AIR);
-    				emerald2X.setType(Material.AIR);
-    			}
-    			else  {
-    				emerald1Z.setType(Material.AIR);
-    				emerald2Z.setType(Material.AIR);
-    			}
-    			world.createExplosion(x, y, z, 3F, false, false);
-    			SoulEnchantments.changeSouls(player, 1, this);
-    			player.sendMessage("§6Congratulations! You have obtained a Tiago Soul by destroying his majestic statue.");
-    		}
-    	}
-    	
-    	if(QuickbarPlugin.validAbsorptionTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
-    		// The item with which the block is being broken is of a valid type and contains the absorption echantment
-    		boolean mcMMOEnabled = false;
-    		Plugin mcmmo = Bukkit.getPluginManager().getPlugin("mcMMO");
-    		mcMMO mcMMOPlugin = null;
-    		if(mcmmo != null)  {
-    			if(Bukkit.getPluginManager().isPluginEnabled(mcmmo))  {
-    				mcMMOEnabled = true;
-    				mcMMOPlugin = (mcMMO) mcmmo;
-    			}
-    		}
-    		
-    		Block block = e.getBlock();
-    		Collection<ItemStack> drops = block.getDrops(item, player);  // Get a list of the drops that the block should provide
-    		e.setDropItems(false);  // Prevent the block from dropping items
-    		int bonusCount = 1;
-    		
-    		if(!mcMMOEnabled)  {
-    			for(ItemStack is : drops)  {
-    				this.giveItem(player, is);
-    			}
-    			return;
-    		}
-    		
-    		// This code only runs if mcMMO is enabled
-    		McMMOPlayer mcMMOPlayer = UserManager.getPlayer(player);
-			MiningManager mm = mcMMOPlayer.getMiningManager();
-			mm.miningBlockCheck(block.getState());
-			
-			HashSet<Material> uniqueMaterials = new HashSet<>();
-			boolean dontRewardTE = false; //If we suspect TEs are mixed in with other things don't reward bonus drops for anything that isn't a block
-			int blockCount = 0;
-			for(ItemStack itemStack : drops)  {
-				//Track unique materials
-				uniqueMaterials.add(itemStack.getType());
-				
-				// Count blocks as second failsafe
-				if(itemStack.getType().isBlock())  {
-					blockCount++;
-				}
-			}
-			
-			if(uniqueMaterials.size() > 1) {
-	            //Too many things are dropping, assume tile entities might be duped
-	            //Technically this would also prevent something like coal from being bonus dropped if you placed a TE above a coal ore when mining it but that's pretty edge case and this is a good solution for now
-	            dontRewardTE = true;
-	        }
-			
-			if(blockCount <= 1)  {
-				for(ItemStack is : drops)  {
-					if(is.getAmount() <= 0)  {
-						this.giveItem(player, is);
-						continue;
-					}
-					
-					//If we suspect TEs might be duped only reward block
-	                if(dontRewardTE) {
-	                    if(!is.getType().isBlock()) {
-	                        this.giveItem(player, is);
-	                        continue;
-	                    }
-	                }
-	                
-	                if(mcMMO.getPlaceStore().isTrue(block.getState()))  {
-	                	this.giveItem(player, is);
-	                	continue;
-	                }
-	                
-	                if (block.getMetadata(mcMMO.BONUS_DROPS_METAKEY).size() > 0) {
-	                    BonusDropMeta bonusDropMeta = (BonusDropMeta) block.getMetadata(mcMMO.BONUS_DROPS_METAKEY).get(0);
-	                    bonusCount = bonusDropMeta.asInt();
-	                    	
-	                    for (int i = 0; i < bonusCount + 1; i++) {
-	                        this.giveItem(player, is);
-	                    }
-	                }
-	                else  {
-	                	this.giveItem(player, is);
-	                }
-				}
-			}
-			
-			
-			if(block.hasMetadata(mcMMO.BONUS_DROPS_METAKEY))
-	            block.removeMetadata(mcMMO.BONUS_DROPS_METAKEY, mcMMOPlugin);
-    	}
-    	
-    	if(QuickbarPlugin.validDoublexpTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
-    		e.setExpToDrop(e.getExpToDrop() * 2);
-    	}
-    }
-    
-    @EventHandler
-    public void onPlayerFoodChange(FoodLevelChangeEvent e)  {
-    	if(e.getEntity() == null || e.getItem() == null)  {
-    		return;
-    	}
-    	HumanEntity entity = e.getEntity();
-    	if(e.getItem().getType().equals(Material.APPLE) && entity instanceof Player)  {
-    		Player player = (Player) entity;
-    		this.addAppleCount(player.getUniqueId());
-    	}
-    }
-    
-    @EventHandler
-    public void onPlayerLogIn(PlayerJoinEvent e)  {
-    	Player p = e.getPlayer();
-    	String pathApples = "applesEaten." + p.getUniqueId().toString();
-    	String pathDeaths = "deaths." + p.getUniqueId().toString();
-    	if(!this.getConfig().isSet(pathApples))  {
-    		this.getConfig().set(pathApples, 0);
-    	}
-    	if(!this.getConfig().isSet(pathDeaths))  {
-    		this.getConfig().set(pathDeaths, 0);
-    	}
-    }
-    
-    @EventHandler
-    public void onDamage(EntityDamageByEntityEvent e)  {
-    	Entity damagerEntity = e.getDamager();
-    	if(damagerEntity instanceof Player)  {
-    		Player damager = (Player) damagerEntity;
-    		ItemStack item = damager.getInventory().getItemInMainHand();
-    		if(QuickbarPlugin.validVampirismTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_VAMPIRISM))  {
-    			// Item has the enchantment vampirism
-    			// heal for 20 % of damage dealt
-    			double newHealth = damager.getHealth() + 0.2*e.getDamage();
-    			if(newHealth > 20.0)  {
-    				// to prevent setting the health above 20.0 which is the maximum
-    				damager.setHealth(20.0);
-    			}
-    			else  {
-    				damager.setHealth(newHealth);
-    			}
-    		}
-    	}
-    }
-    
-    
-    private void addAppleCount(UUID playerId)  {
-    	String path = "applesEaten." + playerId.toString();
-    	if(this.getConfig().isSet(path))  {
-    		this.getConfig().set(path, this.getConfig().getInt(path) + 1);
-    	}
-    	else  {
-    		this.getConfig().set(path, 1);
-    	}
-    	this.saveConfig();
-    }
-    
-    
-    public void giveItem(Player p, ItemStack item)  {
-    	Inventory inv = p.getInventory();
-    	if(inv.firstEmpty() == -1)  {
-    		p.getWorld().dropItem(p.getLocation(), item);
-    	}
-    	else  {
-    		inv.addItem(item);
-    	}
-    }
-    
-    /**
-     * Returns a list of strings representing the leaderboard for a certain stat that the plugin tracks
-     * @param statPathPrefix The prefix to the stat's path e.g. "deaths" or "applesEaten", NOT INCLUDING THE '.'
-     * @param title The title at the top of the leaderboard
-     * @returna A list of strings representing the leaderboard for a certain stat that the plugin tracks
-     */
-    private List<String> getLeaderboard(String statPathPrefix, String title)  {
-    	List<String> result = new ArrayList<String>();
-    	result.add("---------- " + title + " Leaderboard ----------");
-    	
-    	if(this.getConfig().getConfigurationSection(statPathPrefix) == null || this.getConfig().getConfigurationSection(statPathPrefix).getKeys(false) == null)  {
-    		result.add("No players on the leaderboard yet");
-    		return result;
-    	}
-    	
-    	Set<String> keys = this.getConfig().getConfigurationSection(statPathPrefix).getKeys(false);
-    	String[] sortedUuids = new String[keys.size()];
-    	int i = 0;
-    	for(String uuid : keys)  {
-    		sortedUuids[i] = uuid;
-    		int j = i - 1;
-    		int k = i;
-    		while(j >= 0 && this.getConfig().getInt(statPathPrefix + "." + sortedUuids[k]) > this.getConfig().getInt(statPathPrefix + "." + sortedUuids[j]))  {
-    			QuickbarPlugin.swapInStringList(sortedUuids, k, j);
-    			k--;
-    			j--;
-    		}
-    		i++;
-    	}
-    	
-    	for(int x = 0; x < sortedUuids.length; x++)  {
-    		if(x > 9)  {
-    			break;
-    		}
-    		result.add((x + 1) + ". " + Bukkit.getOfflinePlayer(UUID.fromString(sortedUuids[x])).getName() + ": " + this.getConfig().getString(statPathPrefix + "." + sortedUuids[x]));
-    	}
-    	
-    	return result;
-    }
-    
-    private static void swapInStringList(String[] list, int i, int j)  {
-    	String temp = list[j];
-    	list[j] = list[i];
-    	list[i] = temp;
-    }
-    
-    
-    
-    public boolean isInteger(String string) {
-        try {
-            Integer.valueOf(string);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-    
-    public void switchItems(Player player)  {
-    	PlayerInventory inv = player.getInventory();
-    	for(int i = 0; i < 9; i++)  {
-    		if(inv.getItem(i) == null)  {
-				if(inv.getItem(i + 27) == null)  {
-					// Do nothing since both slots are empty
-				}
-				else  {
-					inv.setItem(i, inv.getItem(i + 27));
-					inv.setItem(i + 27, null);
-				}
-			}
-			else  {
-				if(!inv.getItem(i).getItemMeta().getDisplayName().equalsIgnoreCase("Quickbar Switcher"))  {
-					if(inv.getItem(i + 27) == null)  {
-    					inv.setItem(i + 27, inv.getItem(i));
-    					inv.setItem(i, null);
-    				}
-    				else {
-    					ItemStack tempItem1 = inv.getItem(i);
-    					inv.setItem(i, inv.getItem(i + 27));
-    					inv.setItem(i + 27, tempItem1);
-    				}
-				}
-			}
-    	}
-    }
-    
-    /**
-     * Checks if the player is in the config file for the certain property
-     * @param player The player
-     * @param pathPrefix the prefix to the path of the proprty including the '.', e.g. "deaths." or "applesEaten."
-     * @return true if the player has a value set for this property in the config file, false otherwise
-     */
-    private static boolean isInConfig(String player, String pathPrefix, FileConfiguration config)  {
-    	if(config.isSet(pathPrefix + Bukkit.getOfflinePlayer(player).getUniqueId()))  {
-    		return true;
-    	}
-    	else  {
-    		return false;
-    	}
-    }
-    
-    
-    
-    static private ItemStack qbs()  {
-    	ItemStack item = new ItemStack(Material.STONE_HOE, 1);
-    	ItemMeta meta = item.getItemMeta();
-    	meta.setDisplayName("Quickbar Switcher");
-    	item.setItemMeta(meta);
-    	return item;
     }
 }
 
