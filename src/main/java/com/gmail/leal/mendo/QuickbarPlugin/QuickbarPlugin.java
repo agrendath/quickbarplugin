@@ -50,6 +50,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
 	public final static List<Material> validAbsorptionTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.BOW, Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD})); 
 	public final static List<Material> validDoublexpTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.BOW, Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD})); 
 	public final static List<Material> validVampirismTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD, Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.BOW}));
+	public final static List<Material> validIndestructibilityTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.DIAMOND_SWORD, Material.NETHERITE_SWORD}));
 	public final static String ENCHANTMENT_INDESTRUCTIBILITY = "Indestructibility";
 	public final static String ENCHANTMENT_ABSORPTION = "Magnetism";
 	public final static String ENCHANTMENT_DOUBLEXP = "Harvesting";
@@ -76,7 +77,6 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     }
     
     
-    
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
     	// the /souls command that shows a player's tiago souls
@@ -86,42 +86,17 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			if(args.length == 0)  {
         			if(player != null)  {
         				sender.sendMessage("§5Tiago Soul Balance: " + SoulEnchantments.getSouls(player, this.getConfig()));
-        				return true;
         			}
         			else  {
         				sender.sendMessage("§4Invalid command use, you are not a player.");
-        				return true;
         			}
+        			return true;
         		}
         		else if(args.length == 3 && args[0].equalsIgnoreCase("give"))  {
         			Player receiver = Bukkit.getPlayer(args[1]);
         			try  {
         				int amount = Integer.parseInt(args[2]);
-        				if(amount > 0 && amount <= SoulEnchantments.getSouls(player, this.getConfig()))  {
-        					if(receiver != null)  {
-        						SoulEnchantments.changeSouls(player, amount*-1, this);
-        						SoulEnchantments.changeSouls(receiver, amount, this);
-        						receiver.sendMessage("§5You received " + amount + " tiago soul(s) from " + player.getName());
-        						sender.sendMessage("§5Transferred " + amount + " tiago soul(s) to " + args[1]);
-        						return true;
-        					}
-        					else  {
-        						if(Bukkit.getOfflinePlayer(args[1]).hasPlayedBefore())  {
-        							SoulEnchantments.changeSouls(player, amount*-1, this);
-                					SoulEnchantments.changeSoulsFromUUID(Bukkit.getOfflinePlayer(args[1]).getUniqueId(), amount, this);
-                					sender.sendMessage("§5Transferred " + amount + " tiago soul(s) to " + args[1]);
-                					return true;
-                				}
-                				else  {
-                					sender.sendMessage("Cannot find player " + args[1]);
-                    				return false;
-                				}
-        					}
-        				}
-        				else  {
-    						sender.sendMessage("Invalid amount or you do not have enough souls to complete this transaction");
-    						return false;
-    					}
+        				return SoulEnchantments.soulTransfer(amount, player, receiver, args[1], this);
         			}
         			catch(NumberFormatException nfe)  {
     					sender.sendMessage(args[2] + " is not a valid amount");
@@ -267,33 +242,11 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			else  {
     				if(GeneralUtil.isInteger(args[0]))  {
     					int amount = Integer.parseInt(args[0]);
-    					int xpAmount = amount*100;
-    					Player p = (Player) sender;
-    					//Inventory inv = p.getInventory();
-    					
-    					// Check if the player has enough xp to get the required amount of bottles
-    					if(xpAmount > XPUtil.getPlayerExp(p))  {
-    						// Get maximum amount of bottles you can get
-    						xpAmount = XPUtil.getPlayerExp(p);
-    						amount = (int) Math.floor(xpAmount/100);
-    					}
-    					int extraAmount = xpAmount%100;
-    					
-    					
-    					if(amount > 64)  {
-							int stacks = (int) Math.floor(amount/64);
-							int remainder = amount%64;
-							for(int n = 0; n < stacks; n++)  {
-								GeneralUtil.giveItem(p, new ItemStack(Material.EXPERIENCE_BOTTLE, 64));
-							}
-							GeneralUtil.giveItem(p, new ItemStack(Material.EXPERIENCE_BOTTLE, remainder));
-						}
-						else  {
-							GeneralUtil.giveItem(p, new ItemStack(Material.EXPERIENCE_BOTTLE, amount));
-						}
-    					
-    					XPUtil.takeExp(p, xpAmount);
-    					XPUtil.takeExp(p, -extraAmount);
+    					XPUtil.convertToBottles((Player) sender, amount);
+    					return true;
+    				}
+    				else  {
+    					sender.sendMessage("§4Invalid amount of xp bottles");
     					return true;
     				}
     			}
@@ -311,108 +264,8 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     				sender.sendMessage("§4Invalid arguments");
     				return false;
     			}
-    			
-    			Player player = (Player)sender;
-    			ItemStack item = player.getInventory().getItemInMainHand();
-    			if(args[0].equalsIgnoreCase(QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
-        			Material type = item.getType();
-        			List<Material> validTypes = QuickbarPlugin.validAbsorptionTypes;
-        			
-        			if(validTypes.contains(type))  {
-        				if(SoulEnchantments.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
-            				sender.sendMessage("§4This item already has the given enchantment");
-            				return true;
-            			}
-        				
-        				// Item is of a valid type to be enchanted
-        				if(SoulEnchantments.getSouls(player, this.getConfig()) >= 1)  {
-        					if(XPUtil.getPlayerExp(player) < 1500)  {
-            					sender.sendMessage("§4You do not have enough xp, you need 1500 exp (you have " + XPUtil.getPlayerExp(player) + ")");
-            					return true;
-            				}
-        					// Player has enough souls to make the enchantment
-        					SoulEnchantments.customEnchant(player.getInventory().getItemInMainHand(), QuickbarPlugin.ENCHANTMENT_ABSORPTION);
-        					SoulEnchantments.changeSouls(player, -1, this);
-        					XPUtil.takeExp(player, 1500);
-        					player.sendMessage("§5Enchantment Complete");
-        				}
-        				else  {
-        					player.sendMessage("§4You need 1 soul to enchant this item, unfortunately you are soulless");
-        				}
-        				return true;
-        			}
-        			else  {
-        				sender.sendMessage("§4The given enchantment cannot be applied to this item");
-        				return true;
-        			}
-    			}
-    			else if(args[0].equalsIgnoreCase(QuickbarPlugin.ENCHANTMENT_INDESTRUCTIBILITY))  {
-    				Material type = item.getType();
-    				if(!(type.equals(Material.DIAMOND_SWORD) || type.equals(Material.NETHERITE_SWORD)))  {
-    					sender.sendMessage("§4This enchantment can only be applied to diamond or netherite swords");
-    					return true;
-    				}
-    				if(SoulEnchantments.getSouls(player, this.getConfig()) < 1)  {
-    					sender.sendMessage("§4You do not have enough tiago souls to perform this enchantment (1 needed)");
-    					return true;
-    				}
-    				if(XPUtil.getPlayerExp(player) < 1500)  {
-    					sender.sendMessage("§4You do not have enough xp, you need 1500 exp (you have " + XPUtil.getPlayerExp(player) + ")");
-    					return true;
-    				}
-    				SoulEnchantments.customEnchant(item, QuickbarPlugin.ENCHANTMENT_INDESTRUCTIBILITY);
-    				SoulEnchantments.changeSouls(player, -1, this);
-    				XPUtil.takeExp(player, 1500);
-    				ItemMeta meta = item.getItemMeta();
-    				meta.setUnbreakable(true);
-    				item.setItemMeta(meta);
-    				sender.sendMessage("§5Enchantment complete");
-    				return true;
-    			}
-    			else if(args[0].equalsIgnoreCase(QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
-    				Material type = item.getType();
-    				if(!QuickbarPlugin.validDoublexpTypes.contains(type))  {
-    					sender.sendMessage("§4Cannot apply enchantment to this type of item");
-    					return true;
-    				}
-    				if(SoulEnchantments.getSouls(player, this.getConfig()) < 1)  {
-    					sender.sendMessage("§4You do not have enough tiago souls to perform this enchantment (1 needed)");
-    					return true;
-    				}
-    				if(XPUtil.getPlayerExp(player) < 2500)  {
-    					sender.sendMessage("§4You do not have enough xp to perform this enchantment (2500 needed, you have " + XPUtil.getPlayerExp(player) + ")");
-    					return true;
-    				}
-    				SoulEnchantments.customEnchant(item, QuickbarPlugin.ENCHANTMENT_DOUBLEXP);
-    				SoulEnchantments.changeSouls(player, -1, this);
-    				XPUtil.takeExp(player, 2500);
-    				sender.sendMessage("§5Enchantment complete");
-    				return true;
-    			}
-    			else if(args[0].equalsIgnoreCase(QuickbarPlugin.ENCHANTMENT_VAMPIRISM))  {
-    				Material type = item.getType();
-    				if(!QuickbarPlugin.validVampirismTypes.contains(type))  {
-    					sender.sendMessage("§4Cannot apply enchantment to this type of item");
-    					return true;
-    				}
-    				if(SoulEnchantments.getSouls(player, this.getConfig()) < 1)  {
-    					sender.sendMessage("§4You do not have enough tiago souls to perform this enchantment (1 needed)");
-    					return true;
-    				}
-    				if(XPUtil.getPlayerExp(player) < 3000)  {
-    					sender.sendMessage("§4You do not have enough xp to perform this enchantment (3000 needed, you have " + XPUtil.getPlayerExp(player) + ")");
-    					return true;
-    				}
-    				SoulEnchantments.customEnchant(item, QuickbarPlugin.ENCHANTMENT_VAMPIRISM);
-    				SoulEnchantments.changeSouls(player, -1, this);
-    				XPUtil.takeExp(player, 3000);
-    				sender.sendMessage("§5Enchantment complete");
-    				return true;
-    				
-    			}
     			else  {
-    				sender.sendMessage("§4Invalid enchantment");
-    				return true;
+    				return SoulEnchantments.soulEnchant(args[0], (Player) sender, this);
     			}
     		}
     		else  {

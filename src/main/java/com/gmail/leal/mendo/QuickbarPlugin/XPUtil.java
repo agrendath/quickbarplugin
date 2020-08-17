@@ -1,8 +1,39 @@
 package com.gmail.leal.mendo.QuickbarPlugin;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class XPUtil {
+	
+	public static void convertToBottles(Player player, int amount)  {
+		int xpAmount = amount*100;
+		
+		// Check if the player has enough xp to get the required amount of bottles
+		if(xpAmount > XPUtil.getPlayerExp(player))  {
+			// Get maximum amount of bottles you can get
+			xpAmount = XPUtil.getPlayerExp(player);
+			amount = (int) Math.floor(xpAmount/100);
+		}
+		int extraAmount = xpAmount%100;
+		
+		
+		if(amount > 64)  {
+			int stacks = (int) Math.floor(amount/64);
+			int remainder = amount%64;
+			for(int n = 0; n < stacks; n++)  {
+				GeneralUtil.giveItem(player, new ItemStack(Material.EXPERIENCE_BOTTLE, 64));
+			}
+			GeneralUtil.giveItem(player, new ItemStack(Material.EXPERIENCE_BOTTLE, remainder));
+		}
+		else  {
+			GeneralUtil.giveItem(player, new ItemStack(Material.EXPERIENCE_BOTTLE, amount));
+		}
+		
+		XPUtil.takeExp(player, xpAmount);
+		XPUtil.takeExp(player, -extraAmount);
+	}
+	
 	// Calculate amount of EXP needed to level up
     public static int getExpToLevelUp(int level)  {
     	if(level <= 15)  {
