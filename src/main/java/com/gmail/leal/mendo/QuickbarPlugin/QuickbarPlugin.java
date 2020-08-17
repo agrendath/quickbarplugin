@@ -35,6 +35,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -85,7 +86,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			Player player = Bukkit.getPlayer(sender.getName());
     			if(args.length == 0)  {
         			if(player != null)  {
-        				sender.sendMessage("§5Tiago Soul Balance: " + this.getSouls(player));
+        				sender.sendMessage("§5Tiago Soul Balance: " + SoulEnchantments.getSouls(player, this.getConfig()));
         				return true;
         			}
         			else  {
@@ -97,18 +98,18 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         			Player receiver = Bukkit.getPlayer(args[1]);
         			try  {
         				int amount = Integer.parseInt(args[2]);
-        				if(amount > 0 && amount <= this.getSouls(player))  {
+        				if(amount > 0 && amount <= SoulEnchantments.getSouls(player, this.getConfig()))  {
         					if(receiver != null)  {
-        						this.changeSouls(player, amount*-1);
-        						this.changeSouls(receiver, amount);
+        						SoulEnchantments.changeSouls(player, amount*-1, this);
+        						SoulEnchantments.changeSouls(receiver, amount, this);
         						receiver.sendMessage("§5You received " + amount + " tiago soul(s) from " + player.getName());
         						sender.sendMessage("§5Transferred " + amount + " tiago soul(s) to " + args[1]);
         						return true;
         					}
         					else  {
         						if(Bukkit.getOfflinePlayer(args[1]).hasPlayedBefore())  {
-        							this.changeSouls(player, amount*-1);
-                					this.changeSoulsFromUUID(Bukkit.getOfflinePlayer(args[1]).getUniqueId(), amount);
+        							SoulEnchantments.changeSouls(player, amount*-1, this);
+                					SoulEnchantments.changeSoulsFromUUID(Bukkit.getOfflinePlayer(args[1]).getUniqueId(), amount, this);
                 					sender.sendMessage("§5Transferred " + amount + " tiago soul(s) to " + args[1]);
                 					return true;
                 				}
@@ -174,7 +175,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         			return false;
         		}
         		else {
-        			if(Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && isInConfig(args[0], "deaths."))  {
+        			if(Bukkit.getOfflinePlayer(args[0]).hasPlayedBefore() && isInConfig(args[0], "deaths.", this.getConfig()))  {
         				sender.sendMessage("§d" + args[0].substring(0, 1).toUpperCase() + args[0].substring(1) + " has died " + this.getConfig().getString("deaths." + Bukkit.getOfflinePlayer(args[0]).getUniqueId().toString()) + " time(s)");
         			}
         			else  {
@@ -319,20 +320,20 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         			List<Material> validTypes = QuickbarPlugin.validAbsorptionTypes;
         			
         			if(validTypes.contains(type))  {
-        				if(hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
+        				if(SoulEnchantments.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
             				sender.sendMessage("§4This item already has the given enchantment");
             				return true;
             			}
         				
         				// Item is of a valid type to be enchanted
-        				if(this.getSouls(player) >= 1)  {
+        				if(SoulEnchantments.getSouls(player, this.getConfig()) >= 1)  {
         					if(XPUtil.getPlayerExp(player) < 1500)  {
             					sender.sendMessage("§4You do not have enough xp, you need 1500 exp (you have " + XPUtil.getPlayerExp(player) + ")");
             					return true;
             				}
         					// Player has enough souls to make the enchantment
-        					this.customEnchant(player.getInventory().getItemInMainHand(), QuickbarPlugin.ENCHANTMENT_ABSORPTION);
-        					this.changeSouls(player, -1);
+        					SoulEnchantments.customEnchant(player.getInventory().getItemInMainHand(), QuickbarPlugin.ENCHANTMENT_ABSORPTION);
+        					SoulEnchantments.changeSouls(player, -1, this);
         					XPUtil.takeExp(player, 1500);
         					player.sendMessage("§5Enchantment Complete");
         				}
@@ -352,7 +353,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     					sender.sendMessage("§4This enchantment can only be applied to diamond or netherite swords");
     					return true;
     				}
-    				if(this.getSouls(player) < 1)  {
+    				if(SoulEnchantments.getSouls(player, this.getConfig()) < 1)  {
     					sender.sendMessage("§4You do not have enough tiago souls to perform this enchantment (1 needed)");
     					return true;
     				}
@@ -360,8 +361,8 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     					sender.sendMessage("§4You do not have enough xp, you need 1500 exp (you have " + XPUtil.getPlayerExp(player) + ")");
     					return true;
     				}
-    				this.customEnchant(item, QuickbarPlugin.ENCHANTMENT_INDESTRUCTIBILITY);
-    				this.changeSouls(player, -1);
+    				SoulEnchantments.customEnchant(item, QuickbarPlugin.ENCHANTMENT_INDESTRUCTIBILITY);
+    				SoulEnchantments.changeSouls(player, -1, this);
     				XPUtil.takeExp(player, 1500);
     				ItemMeta meta = item.getItemMeta();
     				meta.setUnbreakable(true);
@@ -375,7 +376,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     					sender.sendMessage("§4Cannot apply enchantment to this type of item");
     					return true;
     				}
-    				if(this.getSouls(player) < 1)  {
+    				if(SoulEnchantments.getSouls(player, this.getConfig()) < 1)  {
     					sender.sendMessage("§4You do not have enough tiago souls to perform this enchantment (1 needed)");
     					return true;
     				}
@@ -383,8 +384,8 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     					sender.sendMessage("§4You do not have enough xp to perform this enchantment (2500 needed, you have " + XPUtil.getPlayerExp(player) + ")");
     					return true;
     				}
-    				this.customEnchant(item, QuickbarPlugin.ENCHANTMENT_DOUBLEXP);
-    				this.changeSouls(player, -1);
+    				SoulEnchantments.customEnchant(item, QuickbarPlugin.ENCHANTMENT_DOUBLEXP);
+    				SoulEnchantments.changeSouls(player, -1, this);
     				XPUtil.takeExp(player, 2500);
     				sender.sendMessage("§5Enchantment complete");
     				return true;
@@ -395,7 +396,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     					sender.sendMessage("§4Cannot apply enchantment to this type of item");
     					return true;
     				}
-    				if(this.getSouls(player) < 1)  {
+    				if(SoulEnchantments.getSouls(player, this.getConfig()) < 1)  {
     					sender.sendMessage("§4You do not have enough tiago souls to perform this enchantment (1 needed)");
     					return true;
     				}
@@ -403,8 +404,8 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     					sender.sendMessage("§4You do not have enough xp to perform this enchantment (3000 needed, you have " + XPUtil.getPlayerExp(player) + ")");
     					return true;
     				}
-    				this.customEnchant(item, QuickbarPlugin.ENCHANTMENT_VAMPIRISM);
-    				this.changeSouls(player, -1);
+    				SoulEnchantments.customEnchant(item, QuickbarPlugin.ENCHANTMENT_VAMPIRISM);
+    				SoulEnchantments.changeSouls(player, -1, this);
     				XPUtil.takeExp(player, 3000);
     				sender.sendMessage("§5Enchantment complete");
     				return true;
@@ -432,13 +433,13 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	Player killer = killed.getKiller();
     	if(killed.getUniqueId().toString().equals("b2a75ec7-c556-4f47-8b61-bfb1780b4ac5")) {  // killing tiago
     		killer.sendMessage("§6Congratulations! You have obtained a §5Tiago Soul");
-    		this.changeSouls(killer, 1);
+    		SoulEnchantments.changeSouls(killer, 1, this);
     	}
     	else if(killed.getUniqueId().toString().equals("df736569-ffed-40e7-9c92-074661b86b09"))  {  // killing lucas (10% chance of tiago soul)
     		int random = (int) (Math.random() * 10 + 1);  // random int in interval [0, 9] (inclusive)
     		if(random == 0)  {
     			killer.sendMessage("§6Congratulations! You have obtained a §5Tiago Soul");
-    			this.changeSouls(killer, 1);
+    			SoulEnchantments.changeSouls(killer, 1, this);
     		}
     	}
     }
@@ -450,14 +451,14 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		Player killer = (Player) killed.getKiller();
     		ItemStack murderWeapon = killer.getInventory().getItemInMainHand();
     		Material weaponType = murderWeapon.getType();
-    		if(QuickbarPlugin.validAbsorptionTypes.contains(weaponType) && hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
+    		if(QuickbarPlugin.validAbsorptionTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
     			Collection<ItemStack> drops = e.getDrops();
     			for(ItemStack is : drops)  {
     				this.giveItem(killer, is);
     			}
     			e.getDrops().clear();
     		}
-    		if(QuickbarPlugin.validDoublexpTypes.contains(weaponType) && hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
+    		if(QuickbarPlugin.validDoublexpTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
     			e.setDroppedExp(e.getDroppedExp() * 2);  // Double the xp dropped
     		}
     	}
@@ -487,7 +488,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     public void onDeath(PlayerDeathEvent e)  {
     	Player player = (Player) e.getEntity();
     	if(player instanceof Player)  {
-    		if(isInConfig(player.getName(), "deaths."))  { // Add death to config
+    		if(isInConfig(player.getName(), "deaths.", this.getConfig()))  { // Add death to config
     			this.getConfig().set("deaths." + player.getUniqueId(), this.getConfig().getInt("deaths." + player.getUniqueId()) + 1);
     			saveConfig();
     		}
@@ -543,12 +544,12 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     				emerald2Z.setType(Material.AIR);
     			}
     			world.createExplosion(x, y, z, 3F, false, false);
-    			this.changeSouls(player, 1);
+    			SoulEnchantments.changeSouls(player, 1, this);
     			player.sendMessage("§6Congratulations! You have obtained a Tiago Soul by destroying his majestic statue.");
     		}
     	}
     	
-    	if(QuickbarPlugin.validAbsorptionTypes.contains(item.getType()) && hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
+    	if(QuickbarPlugin.validAbsorptionTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
     		// The item with which the block is being broken is of a valid type and contains the absorption echantment
     		boolean mcMMOEnabled = false;
     		Plugin mcmmo = Bukkit.getPluginManager().getPlugin("mcMMO");
@@ -635,7 +636,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
 	            block.removeMetadata(mcMMO.BONUS_DROPS_METAKEY, mcMMOPlugin);
     	}
     	
-    	if(QuickbarPlugin.validDoublexpTypes.contains(item.getType()) && hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
+    	if(QuickbarPlugin.validDoublexpTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
     		e.setExpToDrop(e.getExpToDrop() * 2);
     	}
     }
@@ -671,33 +672,21 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	if(damagerEntity instanceof Player)  {
     		Player damager = (Player) damagerEntity;
     		ItemStack item = damager.getInventory().getItemInMainHand();
-    		if(QuickbarPlugin.validVampirismTypes.contains(item.getType()) && hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_VAMPIRISM))  {
+    		if(QuickbarPlugin.validVampirismTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_VAMPIRISM))  {
     			// Item has the enchantment vampirism
     			// heal for 20 % of damage dealt
-    			damager.setHealth(damager.getHealth() + 0.2*e.getDamage());
+    			double newHealth = damager.getHealth() + 0.2*e.getDamage();
+    			if(newHealth > 20.0)  {
+    				// to prevent setting the health above 20.0 which is the maximum
+    				damager.setHealth(20.0);
+    			}
+    			else  {
+    				damager.setHealth(newHealth);
+    			}
     		}
     	}
     }
     
-    /**
-     * @pre The given enchantment is valid for the given item, must be checked beforehand
-     */
-    private void customEnchant(ItemStack item, String enchantment) {
-    	ItemMeta meta = item.getItemMeta();
-    	if(hasCustomEnchant(item, enchantment) || meta == null)  {
-    		return;
-    	}
-    	List<String> newLore = null;
-    	if(meta.hasLore())  {
-    		newLore = meta.getLore();
-    	}
-    	else  {
-    		newLore = new ArrayList<String>();
-    	}
-    	newLore.add(enchantment);
-    	meta.setLore(newLore);
-    	item.setItemMeta(meta);
-    }
     
     private void addAppleCount(UUID playerId)  {
     	String path = "applesEaten." + playerId.toString();
@@ -710,63 +699,6 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	this.saveConfig();
     }
     
-    private static boolean hasCustomEnchant(ItemStack item, String enchantment)  {
-    	ItemMeta meta = item.getItemMeta();
-    	List<String> lore = meta.getLore();
-    	if(meta != null && lore != null && lore.contains(enchantment))  {
-    		return true;
-    	}
-    	else  {
-    		return false;
-    	}
-    }
-    
-    private int getSouls(Player player)  {
-    	if(this.soulsRegisteredInConfig(player))  {
-    		return this.getConfig().getInt("souls." + player.getUniqueId());
-    	}
-    	else  {
-    		return 0;
-    	}
-    }
-    
-    /**
-     * Will change a player's souls by [change]
-     * @pre If the change is negative, it must not be smaller or equal to the amount of souls the player already has
-     * 		| (change < 0) ? (change*-1 <= this.getSouls(player)) : true
-     */
-    private void changeSouls(Player player, int change)  {
-    	String path = "souls." + player.getUniqueId();
-    	if(this.soulsRegisteredInConfig(player))  {
-    		this.getConfig().set(path, this.getConfig().getInt(path) + change);
-    		saveConfig();
-    	}
-    	else  {
-    		if(change > 0)  {
-    			this.getConfig().set(path, change);
-    			saveConfig();
-    		}
-    	}
-    }
-    
-    private void changeSoulsFromUUID(UUID uuid, int change)  {
-    	String id = uuid.toString();
-    	String path = "souls." + id;
-    	boolean registered = false;
-    	if(this.getConfig().isSet("souls." + id))  {
-    		registered = true;
-    	}
-    	if(registered)  {
-    		this.getConfig().set(path, this.getConfig().getInt(path) + change);
-    		saveConfig();
-    	}
-    	else  {
-    		if(change > 0)  {
-    			this.getConfig().set(path, change);
-    			saveConfig();
-    		}
-    	}
-    }
     
     public void giveItem(Player p, ItemStack item)  {
     	Inventory inv = p.getInventory();
@@ -869,8 +801,8 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
      * @param pathPrefix the prefix to the path of the proprty including the '.', e.g. "deaths." or "applesEaten."
      * @return true if the player has a value set for this property in the config file, false otherwise
      */
-    private boolean isInConfig(String player, String pathPrefix)  {
-    	if(this.getConfig().isSet(pathPrefix + Bukkit.getOfflinePlayer(player).getUniqueId()))  {
+    private static boolean isInConfig(String player, String pathPrefix, FileConfiguration config)  {
+    	if(config.isSet(pathPrefix + Bukkit.getOfflinePlayer(player).getUniqueId()))  {
     		return true;
     	}
     	else  {
@@ -878,19 +810,9 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     	}
     }
     
-    /**
-     * Checks if this player has a 'tiago souls' count registered in the config file
-     */
-    private boolean soulsRegisteredInConfig(Player player)  {
-    	if(this.getConfig().isSet("souls." + player.getUniqueId()))  {
-    		return true;
-    	}
-    	else {
-    		return false;
-    	}
-    }
     
-    private ItemStack qbs()  {
+    
+    static private ItemStack qbs()  {
     	ItemStack item = new ItemStack(Material.STONE_HOE, 1);
     	ItemMeta meta = item.getItemMeta();
     	meta.setDisplayName("Quickbar Switcher");
