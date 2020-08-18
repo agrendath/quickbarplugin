@@ -11,7 +11,7 @@ Functionality/Commands:
 - /tiago - Displays useful information about tiago
 - /lucas - Displays useful information about lucas
 - /souls - Shows a player's balance of Tiago Souls
-- /souls give [playername] [amount] - Give the specified amount of souls to another player (this will deduct them from your balance, obviously)
+- /souls give \[playername\] \[amount\] - Give the specified amount of souls to another player (this will deduct them from your balance, obviously)
 - /soulenchant [enchantment] - Enchants the item the player is holding with a soulenchantment, see available enchantments below
 - /janitatop - Shows the leaderboard of the top 10 players with most deaths
 - /janita2top - Shows the leaderboard of the top 10 players with most apples eaten
@@ -20,13 +20,15 @@ Soul Enchantments:
 - Magnetism: usable on all tools and weapons, when you destroy blocks or kill mobs/players the drops get absorbed right into your inventory
 - Indestructibility: usable on diamond and netherite swords, makes the item indestructible/unbreakable
 - Harvesting: usable on all tools and weapons, will drop double xp from any entity you kill or any block you break
-- Vampirism: usable on swords, bows and axes, will heal the attacker for 20% of damage dealt, bows will only heal for 10%
+- Vampirism: usable on swords, bows and axes, will heal the attacker for 10% of damage dealt, bows will only heal for 5%
+- Swiftness: usable on all boots, will make the player faster when equipped with it
 
 Soul Enchantments Costs:
-- Magnetism: 1 Tiago Soul and 1500 xp
-- Indestructibility: 1 Tiago Soul and 1500 xp
-- Harvesting: 1 Tiago Soul and 2500 xp
-- Vampirism: 1 Tiago Soul and 3000 xp
+- Magnetism: 1 Tiago Soul and 2000 xp
+- Indestructibility: 1 Tiago Soul and 2500 xp
+- Harvesting: 1 Tiago Soul and 3000 xp
+- Vampirism: 1 Tiago Soul and 4000 xp
+- Swiftness: 1 Tiago Soul and 4000 xp
 
 Permission Nodes:
 - quickbarplugin.tiago: Grants access to the /tiago command

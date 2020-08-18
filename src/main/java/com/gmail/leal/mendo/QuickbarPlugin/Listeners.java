@@ -65,14 +65,14 @@ public class Listeners implements Listener{
     		Player killer = (Player) killed.getKiller();
     		ItemStack murderWeapon = killer.getInventory().getItemInMainHand();
     		Material weaponType = murderWeapon.getType();
-    		if(QuickbarPlugin.validAbsorptionTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
+    		if(SoulEnchantments.validAbsorptionTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, SoulEnchantments.ENCHANTMENT_ABSORPTION))  {
     			Collection<ItemStack> drops = e.getDrops();
     			for(ItemStack is : drops)  {
     				GeneralUtil.giveItem(killer, is);
     			}
     			e.getDrops().clear();
     		}
-    		if(QuickbarPlugin.validDoublexpTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
+    		if(SoulEnchantments.validDoublexpTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, SoulEnchantments.ENCHANTMENT_DOUBLEXP))  {
     			e.setDroppedExp(e.getDroppedExp() * 2);  // Double the xp dropped
     		}
     	}
@@ -163,7 +163,7 @@ public class Listeners implements Listener{
     		}
     	}
     	
-    	if(QuickbarPlugin.validAbsorptionTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
+    	if(SoulEnchantments.validAbsorptionTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, SoulEnchantments.ENCHANTMENT_ABSORPTION))  {
     		// The item with which the block is being broken is of a valid type and contains the absorption echantment
     		boolean mcMMOEnabled = false;
     		Plugin mcmmo = Bukkit.getPluginManager().getPlugin("mcMMO");
@@ -250,7 +250,7 @@ public class Listeners implements Listener{
 	            block.removeMetadata(mcMMO.BONUS_DROPS_METAKEY, mcMMOPlugin);
     	}
     	
-    	if(QuickbarPlugin.validDoublexpTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
+    	if(SoulEnchantments.validDoublexpTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, SoulEnchantments.ENCHANTMENT_DOUBLEXP))  {
     		e.setExpToDrop(e.getExpToDrop() * 2);
     	}
     }
@@ -295,12 +295,12 @@ public class Listeners implements Listener{
     	
     	if(damager != null && damager.getInventory() != null && damager.getInventory().getItemInMainHand() != null)  {
     		ItemStack item = damager.getInventory().getItemInMainHand();
-    		if(QuickbarPlugin.validVampirismTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, QuickbarPlugin.ENCHANTMENT_VAMPIRISM))  {
+    		if(SoulEnchantments.validVampirismTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, SoulEnchantments.ENCHANTMENT_VAMPIRISM))  {
     			// Item has the enchantment vampirism
-    			// heal for 20 % of damage dealt, or 10% if its a bow
-    			double multiplier = 0.2;
+    			// heal for 10 % of damage dealt, or 5% if its a bow
+    			double multiplier = 0.1;
     			if(item.getType().equals(Material.BOW))  {
-    				multiplier = 0.1;
+    				multiplier = 0.05;
     			}
     			
     			double newHealth = damager.getHealth() + multiplier*e.getDamage();

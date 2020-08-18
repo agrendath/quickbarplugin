@@ -1,18 +1,33 @@
 package com.gmail.leal.mendo.QuickbarPlugin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
 public class SoulEnchantments {
+	
+	public final static List<Material> validAbsorptionTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.BOW, Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD})); 
+	public final static List<Material> validDoublexpTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.BOW, Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD})); 
+	public final static List<Material> validVampirismTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD, Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.BOW}));
+	public final static List<Material> validIndestructibilityTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.DIAMOND_SWORD, Material.NETHERITE_SWORD}));
+	public final static List<Material> validMovespeedTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.LEATHER_BOOTS, Material.IRON_BOOTS, Material.CHAINMAIL_BOOTS, Material.GOLDEN_BOOTS, Material.DIAMOND_BOOTS, Material.NETHERITE_BOOTS}));
+	public final static String ENCHANTMENT_INDESTRUCTIBILITY = "Indestructibility";
+	public final static String ENCHANTMENT_ABSORPTION = "Magnetism";
+	public final static String ENCHANTMENT_DOUBLEXP = "Harvesting";
+	public final static String ENCHANTMENT_VAMPIRISM = "Vampirism";
+	public final static String ENCHANTMENT_MOVESPEED = "Swiftness";
 	
 	public static boolean soulEnchant(String enchantment, Player player, Plugin quickbarPlugin)  {
 		ItemStack item = player.getInventory().getItemInMainHand();
@@ -21,29 +36,35 @@ public class SoulEnchantments {
 		int soulCost = 0;
 		int xpCost = 0;
 		
-		if(enchantment.equalsIgnoreCase(QuickbarPlugin.ENCHANTMENT_ABSORPTION))  {
-			validTypes = QuickbarPlugin.validAbsorptionTypes;
-			enchantment = QuickbarPlugin.ENCHANTMENT_ABSORPTION;
+		if(enchantment.equalsIgnoreCase(ENCHANTMENT_ABSORPTION))  {
+			validTypes = validAbsorptionTypes;
+			enchantment = ENCHANTMENT_ABSORPTION;
 			soulCost = 1;
-			xpCost = 1500;
+			xpCost = 2000;
 		}
-		else if(enchantment.equalsIgnoreCase(QuickbarPlugin.ENCHANTMENT_DOUBLEXP))  {
-			validTypes = QuickbarPlugin.validDoublexpTypes;
-			enchantment = QuickbarPlugin.ENCHANTMENT_DOUBLEXP;
+		else if(enchantment.equalsIgnoreCase(ENCHANTMENT_DOUBLEXP))  {
+			validTypes = validDoublexpTypes;
+			enchantment = ENCHANTMENT_DOUBLEXP;
+			soulCost = 1;
+			xpCost = 3000;
+		}
+		else if(enchantment.equalsIgnoreCase(ENCHANTMENT_INDESTRUCTIBILITY))  {
+			validTypes = validIndestructibilityTypes;
+			enchantment = ENCHANTMENT_INDESTRUCTIBILITY;
 			soulCost = 1;
 			xpCost = 2500;
 		}
-		else if(enchantment.equalsIgnoreCase(QuickbarPlugin.ENCHANTMENT_INDESTRUCTIBILITY))  {
-			validTypes = QuickbarPlugin.validIndestructibilityTypes;
-			enchantment = QuickbarPlugin.ENCHANTMENT_INDESTRUCTIBILITY;
+		else if(enchantment.equalsIgnoreCase(ENCHANTMENT_VAMPIRISM))  {
+			validTypes = validVampirismTypes;
+			enchantment = ENCHANTMENT_VAMPIRISM;
 			soulCost = 1;
-			xpCost = 1500;
+			xpCost = 4000;
 		}
-		else if(enchantment.equalsIgnoreCase(QuickbarPlugin.ENCHANTMENT_VAMPIRISM))  {
-			validTypes = QuickbarPlugin.validVampirismTypes;
-			enchantment = QuickbarPlugin.ENCHANTMENT_VAMPIRISM;
+		else if(enchantment.equalsIgnoreCase(ENCHANTMENT_MOVESPEED))  {
+			validTypes = validMovespeedTypes;
+			enchantment = ENCHANTMENT_MOVESPEED;
 			soulCost = 1;
-			xpCost = 3000;
+			xpCost = 4000;
 		}
 		else  {
 			player.sendMessage("§4Invalid Enchantment");
@@ -73,14 +94,20 @@ public class SoulEnchantments {
 			customEnchant(player.getInventory().getItemInMainHand(), enchantment);
 			changeSouls(player, -soulCost, quickbarPlugin);
 			XPUtil.takeExp(player, xpCost);
-			player.sendMessage("§5Enchantment Complete");
 			
 			// Indestructibility enchantment needs to change the item meta so this is a special case
-			if(enchantment.equalsIgnoreCase(QuickbarPlugin.ENCHANTMENT_INDESTRUCTIBILITY))  {
+			if(enchantment.equalsIgnoreCase(ENCHANTMENT_INDESTRUCTIBILITY))  {
 				ItemMeta meta = item.getItemMeta();
 				meta.setUnbreakable(true);
 				item.setItemMeta(meta);
 			}
+			else if(enchantment.equalsIgnoreCase(ENCHANTMENT_MOVESPEED))  {
+				ItemMeta meta = item.getItemMeta();
+				meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(UUID.randomUUID(), "Extra Speed", 0.2, AttributeModifier.Operation.ADD_SCALAR, EquipmentSlot.FEET));
+				item.setItemMeta(meta);
+			}
+			
+			player.sendMessage("§5Enchantment Complete");
 		}
 		else  {
 			player.sendMessage("§4You need " + soulCost + " soul(s) to enchant this item, unfortunately you do not have enough");
@@ -105,13 +132,13 @@ public class SoulEnchantments {
 					return true;
 				}
 				else  {
-					sender.sendMessage("Cannot find player " + receiverName);
+					sender.sendMessage("§4Cannot find player " + receiverName);
     				return false;
 				}
 			}
 		}
 		else  {
-			sender.sendMessage("Invalid amount or you do not have enough souls to complete this transaction");
+			sender.sendMessage("§4Invalid amount or you do not have enough souls to complete this transaction");
 			return false;
 		}
 	}
