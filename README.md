@@ -22,7 +22,7 @@ Soul Enchantments:
 - Harvesting: usable on all tools and weapons, will drop double xp from any entity you kill or any block you break
 - Vampirism: usable on swords, bows and axes, will heal the attacker for 10% of damage dealt, bows will only heal for 5%
 - Swiftness: usable on all boots, will make the player faster when equipped with it
-- Looting: usable on bows, this is just a way to put the looting enchantment on bows which is not possible in vanilla minecraft
+- Looting: usable on bows, this is just a way to put the looting (only 3) enchantment on bows which is not possible in vanilla minecraft
 
 Soul Enchantments Costs:
 - Magnetism: 1 Tiago Soul and 2000 xp
