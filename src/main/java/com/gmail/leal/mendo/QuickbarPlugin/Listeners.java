@@ -65,15 +65,22 @@ public class Listeners implements Listener{
     		Player killer = (Player) killed.getKiller();
     		ItemStack murderWeapon = killer.getInventory().getItemInMainHand();
     		Material weaponType = murderWeapon.getType();
+    		
+    		if(SoulEnchantments.validDoublexpTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, SoulEnchantments.ENCHANTMENT_DOUBLEXP))  {
+    			e.setDroppedExp(e.getDroppedExp() * 2);  // Double the xp dropped
+    		}
+    		
     		if(SoulEnchantments.validAbsorptionTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, SoulEnchantments.ENCHANTMENT_ABSORPTION))  {
     			Collection<ItemStack> drops = e.getDrops();
     			for(ItemStack is : drops)  {
     				GeneralUtil.giveItem(killer, is);
     			}
     			e.getDrops().clear();
-    		}
-    		if(SoulEnchantments.validDoublexpTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, SoulEnchantments.ENCHANTMENT_DOUBLEXP))  {
-    			e.setDroppedExp(e.getDroppedExp() * 2);  // Double the xp dropped
+    			
+    			// Handle the xp dropped
+    			int xpToGive = e.getDroppedExp();
+    			e.setDroppedExp(0);
+    			XPUtil.changeExp(killer, xpToGive);
     		}
     	}
     }
@@ -165,6 +172,13 @@ public class Listeners implements Listener{
     	
     	if(SoulEnchantments.validAbsorptionTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, SoulEnchantments.ENCHANTMENT_ABSORPTION))  {
     		// The item with which the block is being broken is of a valid type and contains the absorption echantment
+    		
+    		// First handle the xp drops
+    		int xpToGive = e.getExpToDrop();
+    		e.setExpToDrop(0);
+    		XPUtil.changeExp(player, xpToGive);
+    		
+    		// Then handle the loot drops
     		boolean mcMMOEnabled = false;
     		Plugin mcmmo = Bukkit.getPluginManager().getPlugin("mcMMO");
     		mcMMO mcMMOPlugin = null;

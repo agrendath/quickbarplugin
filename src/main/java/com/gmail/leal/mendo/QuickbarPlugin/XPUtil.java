@@ -34,6 +34,49 @@ public class XPUtil {
 		XPUtil.takeExp(player, -extraAmount);
 	}
 	
+	/**
+	 * Change a Player's exp.
+	 * <p>
+	 * This method should be used in place of {@link Player#giveExp(int)}, which does not properly
+	 * account for different levels requiring different amounts of experience.
+	 * 
+	 * @param player the Player affected
+	 * @param exp the amount of experience to add or remove
+	 */
+	public static void changeExp(Player player, int exp) {
+		exp += getPlayerExp(player);
+
+		if (exp < 0) {
+			exp = 0;
+		}
+
+		double levelAndExp = getLevelFromExp(exp);
+
+		int level = (int) levelAndExp;
+		player.setLevel(level);
+		player.setExp((float) (levelAndExp - level));
+	}
+	
+	/**
+	 * Calculates level based on total experience.
+	 * 
+	 * @param exp the total experience
+	 * 
+	 * @return the level calculated
+	 */
+	public static double getLevelFromExp(long exp) {
+		if (exp > 1395) {
+			return (Math.sqrt(72 * exp - 54215) + 325) / 18;
+		}
+		if (exp > 315) {
+			return Math.sqrt(40 * exp - 7839) / 10 + 8.1;
+		}
+		if (exp > 0) {
+			return Math.sqrt(exp + 9) - 3;
+		}
+		return 0;
+	}
+	
 	// Calculate amount of EXP needed to level up
     public static int getExpToLevelUp(int level)  {
     	if(level <= 15)  {
