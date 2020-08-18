@@ -17,7 +17,7 @@ Functionality/Commands:
 - /janita2top - Shows the leaderboard of the top 10 players with most apples eaten
 
 Soul Enchantments:
-- Magnetism: usable on all tools and weapons, when you destroy blocks or kill mobs/players the drops get absorbed right into your inventory
+- Magnetism: usable on all tools and weapons, when you destroy blocks or kill mobs/players the loot drops and xp drops get absorbed right into your inventory/xp bar
 - Indestructibility: usable on diamond and netherite swords, makes the item indestructible/unbreakable
 - Harvesting: usable on all tools and weapons, will drop double xp from any entity you kill or any block you break
 - Vampirism: usable on swords, bows and axes, will heal the attacker for 10% of damage dealt, bows will only heal for 5%
