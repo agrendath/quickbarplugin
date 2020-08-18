@@ -91,6 +91,10 @@ public class SoulEnchantments {
 			player.sendMessage("§4This item already has the given enchantment");
 			return true;
 		}
+		if(enchantment.equalsIgnoreCase("looting") && item.containsEnchantment(Enchantment.LOOT_BONUS_MOBS))  {
+			player.sendMessage("§4This item already has the given enchantment");
+			return true;
+		}
 		
 		// Item is of a valid type to be enchanted
 		if(SoulEnchantments.getSouls(player, quickbarPlugin.getConfig()) >= soulCost)  {
