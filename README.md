@@ -15,6 +15,7 @@ Functionality/Commands:
 - /soulenchant [enchantment] - Enchants the item the player is holding with a soulenchantment, see available enchantments below
 - /janitatop - Shows the leaderboard of the top 10 players with most deaths
 - /janita2top - Shows the leaderboard of the top 10 players with most apples eaten
+- /extract <enchantment> - Extracts an enchantment from the item in the player's hand by giving it to them in the form of an enchanted book and removing it from the item, this costs 2000 xp and does not work for soul enchantments
 
 Soul Enchantments:
 - Magnetism: usable on all tools and weapons, when you destroy blocks or kill mobs/players the loot drops and xp drops get absorbed right into your inventory/xp bar
@@ -43,3 +44,4 @@ Permission Nodes:
 - quickbarplugin.soulenchant: Grants access to the /soulenchant command
 - quickbarplugin.janitatop: Grants access to the /janitatop command
 - quickbarplugin.janita2top: Grants access to the /janita2top command
+- quickbarplugin.extract: Grants access to the /extract command

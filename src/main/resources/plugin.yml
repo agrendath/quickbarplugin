@@ -55,3 +55,8 @@ commands:
     usage: /janita2top
     permission: quickbarplugin.janita2top
     permission-message: You don't have permission for that
+  extract:
+    description: Extracts an enchantment from an item and gives it to the player in enchanted book form, does not work for soul enchantments
+    usage: /extract <enchantment>
+    permission: quickbarplugin.extract
+    permission-message: You don't have permission for that
