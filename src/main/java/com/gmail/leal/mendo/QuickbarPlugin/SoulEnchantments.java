@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -66,6 +67,14 @@ public class SoulEnchantments {
 			soulCost = 1;
 			xpCost = 4000;
 		}
+		else if(enchantment.equalsIgnoreCase("looting"))  {
+			// Special looting for bows soul enchantment
+			validTypes = new ArrayList<Material>();
+			validTypes.add(Material.BOW);
+			enchantment = "Looting";
+			soulCost = 0;
+			xpCost = 2000;
+		}
 		else  {
 			player.sendMessage("§4Invalid Enchantment");
 			return true;
@@ -91,11 +100,13 @@ public class SoulEnchantments {
 			}
 			
 			// Player has enough souls to make the enchantment
-			customEnchant(player.getInventory().getItemInMainHand(), enchantment);
-			changeSouls(player, -soulCost, quickbarPlugin);
+			if(!enchantment.equalsIgnoreCase("looting"))  {
+				customEnchant(player.getInventory().getItemInMainHand(), enchantment);
+				changeSouls(player, -soulCost, quickbarPlugin);
+			}
 			XPUtil.takeExp(player, xpCost);
 			
-			// Indestructibility enchantment needs to change the item meta so this is a special case
+			// Enchantments that change item meta/or attributes
 			if(enchantment.equalsIgnoreCase(ENCHANTMENT_INDESTRUCTIBILITY))  {
 				ItemMeta meta = item.getItemMeta();
 				meta.setUnbreakable(true);
@@ -105,6 +116,9 @@ public class SoulEnchantments {
 				ItemMeta meta = item.getItemMeta();
 				meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(UUID.randomUUID(), "Extra Speed", 0.2, AttributeModifier.Operation.ADD_SCALAR, EquipmentSlot.FEET));
 				item.setItemMeta(meta);
+			}
+			else if(enchantment.equalsIgnoreCase("looting"))  {
+				item.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 3);
 			}
 			
 			player.sendMessage("§5Enchantment Complete");
