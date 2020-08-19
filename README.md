@@ -25,7 +25,7 @@ Soul Enchantments:
 - Swiftness: usable on all boots, will make the player faster when equipped with it
 - Looting: usable on bows, this is just a way to put the looting (only 3) enchantment on bows which is not possible in vanilla minecraft
 - Thunderlord: usable on all weapons and bows, gives a 10 % chance to summon lightning doing 25% of the original hit's damage extra
-- Toughness: usable on diamond or netherite armor, gives the wearer a 20% health boost (aka 2 extra hearts)
+- Toughness: usable on diamond or netherite armor and shields, gives the wearer a 20% health boost (aka 2 extra hearts)
 
 Soul Enchantments Costs:
 - Magnetism: 1 Tiago Soul and 2000 xp

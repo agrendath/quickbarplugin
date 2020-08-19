@@ -26,7 +26,7 @@ public class SoulEnchantments {
 	public final static List<Material> validIndestructibilityTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.DIAMOND_SWORD, Material.NETHERITE_SWORD}));
 	public final static List<Material> validMovespeedTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.LEATHER_BOOTS, Material.IRON_BOOTS, Material.CHAINMAIL_BOOTS, Material.GOLDEN_BOOTS, Material.DIAMOND_BOOTS, Material.NETHERITE_BOOTS}));
 	public final static List<Material> validThunderlordTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD, Material.BOW}));
-	public final static List<Material> validToughnessTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.DIAMOND_BOOTS, Material.NETHERITE_BOOTS, Material.DIAMOND_LEGGINGS, Material.NETHERITE_LEGGINGS, Material.DIAMOND_CHESTPLATE, Material.NETHERITE_CHESTPLATE, Material.DIAMOND_HELMET, Material.NETHERITE_HELMET}));
+	public final static List<Material> validToughnessTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.DIAMOND_BOOTS, Material.NETHERITE_BOOTS, Material.DIAMOND_LEGGINGS, Material.NETHERITE_LEGGINGS, Material.DIAMOND_CHESTPLATE, Material.NETHERITE_CHESTPLATE, Material.DIAMOND_HELMET, Material.NETHERITE_HELMET, Material.SHIELD}));
 	public final static String ENCHANTMENT_INDESTRUCTIBILITY = "Indestructibility";
 	public final static String ENCHANTMENT_ABSORPTION = "Magnetism";
 	public final static String ENCHANTMENT_DOUBLEXP = "Harvesting";
