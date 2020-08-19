@@ -26,12 +26,14 @@ public class SoulEnchantments {
 	public final static List<Material> validIndestructibilityTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.DIAMOND_SWORD, Material.NETHERITE_SWORD}));
 	public final static List<Material> validMovespeedTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.LEATHER_BOOTS, Material.IRON_BOOTS, Material.CHAINMAIL_BOOTS, Material.GOLDEN_BOOTS, Material.DIAMOND_BOOTS, Material.NETHERITE_BOOTS}));
 	public final static List<Material> validThunderlordTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD, Material.BOW}));
+	public final static List<Material> validToughnessTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.DIAMOND_BOOTS, Material.NETHERITE_BOOTS, Material.DIAMOND_LEGGINGS, Material.NETHERITE_LEGGINGS, Material.DIAMOND_CHESTPLATE, Material.NETHERITE_CHESTPLATE, Material.DIAMOND_HELMET, Material.NETHERITE_HELMET}));
 	public final static String ENCHANTMENT_INDESTRUCTIBILITY = "Indestructibility";
 	public final static String ENCHANTMENT_ABSORPTION = "Magnetism";
 	public final static String ENCHANTMENT_DOUBLEXP = "Harvesting";
 	public final static String ENCHANTMENT_VAMPIRISM = "Vampirism";
 	public final static String ENCHANTMENT_MOVESPEED = "Swiftness";
 	public final static String ENCHANTMENT_THUNDERLORD = "Thunderlord";
+	public final static String ENCHANTMENT_TOUGHNESS = "Toughness";
 	
 	public static boolean soulEnchant(String enchantment, Player player, Plugin quickbarPlugin)  {
 		ItemStack item = player.getInventory().getItemInMainHand();
@@ -75,6 +77,12 @@ public class SoulEnchantments {
 			enchantment = ENCHANTMENT_THUNDERLORD;
 			soulCost = 1;
 			xpCost = 3500;
+		}
+		else if(enchantment.equalsIgnoreCase(ENCHANTMENT_TOUGHNESS))  {
+			validTypes = validToughnessTypes;
+			enchantment = ENCHANTMENT_TOUGHNESS;
+			soulCost = 1;
+			xpCost = 4000;
 		}
 		else if(enchantment.equalsIgnoreCase("looting"))  {
 			// Special looting for bows soul enchantment
@@ -132,6 +140,11 @@ public class SoulEnchantments {
 			}
 			else if(enchantment.equalsIgnoreCase("looting"))  {
 				item.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 3);
+			}
+			else if(enchantment.equalsIgnoreCase(ENCHANTMENT_TOUGHNESS))  {
+				ItemMeta meta = item.getItemMeta();
+				meta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(UUID.randomUUID(), "Extra Health", 0.2, AttributeModifier.Operation.ADD_SCALAR, GeneralUtil.getEquipmentSlot(item)));
+				item.setItemMeta(meta);
 			}
 			
 			player.sendMessage("§5Enchantment Complete");
