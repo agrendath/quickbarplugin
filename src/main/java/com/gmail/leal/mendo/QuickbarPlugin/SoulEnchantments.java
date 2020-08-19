@@ -11,6 +11,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -24,11 +25,13 @@ public class SoulEnchantments {
 	public final static List<Material> validVampirismTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD, Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.BOW}));
 	public final static List<Material> validIndestructibilityTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.DIAMOND_SWORD, Material.NETHERITE_SWORD}));
 	public final static List<Material> validMovespeedTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.LEATHER_BOOTS, Material.IRON_BOOTS, Material.CHAINMAIL_BOOTS, Material.GOLDEN_BOOTS, Material.DIAMOND_BOOTS, Material.NETHERITE_BOOTS}));
+	public final static List<Material> validThunderlordTypes = new ArrayList<Material>(Arrays.asList(new Material[] {Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD, Material.BOW}));
 	public final static String ENCHANTMENT_INDESTRUCTIBILITY = "Indestructibility";
 	public final static String ENCHANTMENT_ABSORPTION = "Magnetism";
 	public final static String ENCHANTMENT_DOUBLEXP = "Harvesting";
 	public final static String ENCHANTMENT_VAMPIRISM = "Vampirism";
 	public final static String ENCHANTMENT_MOVESPEED = "Swiftness";
+	public final static String ENCHANTMENT_THUNDERLORD = "Thunderlord";
 	
 	public static boolean soulEnchant(String enchantment, Player player, Plugin quickbarPlugin)  {
 		ItemStack item = player.getInventory().getItemInMainHand();
@@ -66,6 +69,12 @@ public class SoulEnchantments {
 			enchantment = ENCHANTMENT_MOVESPEED;
 			soulCost = 1;
 			xpCost = 4000;
+		}
+		else if(enchantment.equalsIgnoreCase(ENCHANTMENT_THUNDERLORD))  {
+			validTypes = validThunderlordTypes;
+			enchantment = ENCHANTMENT_THUNDERLORD;
+			soulCost = 1;
+			xpCost = 3500;
 		}
 		else if(enchantment.equalsIgnoreCase("looting"))  {
 			// Special looting for bows soul enchantment
@@ -253,5 +262,18 @@ public class SoulEnchantments {
     	else {
     		return false;
     	}
+    }
+    
+    /**
+     * Adds the thunderlord bonus damage to the original damage and returns it
+     * @param damager The player who is damaging the entity
+     * @param damaged The entity being damaged
+     * @param originalDamage The original damage of the attack
+     * @return The final damage of the attack with thunderlord bonus added
+     */
+    public static double getDamageWithThunderlord(double originalDamage)  {
+    	double finalDamage = originalDamage;
+    	finalDamage += 0.25 * originalDamage;
+    	return finalDamage;
     }
 }

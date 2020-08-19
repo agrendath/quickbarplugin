@@ -24,6 +24,7 @@ Soul Enchantments:
 - Vampirism: usable on swords, bows and axes, will heal the attacker for 10% of damage dealt, bows will only heal for 5%
 - Swiftness: usable on all boots, will make the player faster when equipped with it
 - Looting: usable on bows, this is just a way to put the looting (only 3) enchantment on bows which is not possible in vanilla minecraft
+- Thunderlord: usable on all weapons and bows, gives a 10 % chance to summon lightning doing 25% of the original hit's damage
 
 Soul Enchantments Costs:
 - Magnetism: 1 Tiago Soul and 2000 xp
@@ -32,6 +33,7 @@ Soul Enchantments Costs:
 - Vampirism: 1 Tiago Soul and 4000 xp
 - Swiftness: 1 Tiago Soul and 4000 xp
 - Looting: 0 Tiago Souls and 2000 xp
+- Thunderlord: 1 Tiago Souls and 3500 xp
 
 Permission Nodes:
 - quickbarplugin.tiago: Grants access to the /tiago command

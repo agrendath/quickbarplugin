@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -309,6 +310,15 @@ public class Listeners implements Listener{
     	
     	if(damager != null && damager.getInventory() != null && damager.getInventory().getItemInMainHand() != null)  {
     		ItemStack item = damager.getInventory().getItemInMainHand();
+    		if(SoulEnchantments.validThunderlordTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, SoulEnchantments.ENCHANTMENT_THUNDERLORD))  {
+				// Apply potential thunderlord damage and lightning, 10% chance
+				int random = (int) (Math.random() * 10 + 1);
+				if(random == 1)  {
+					e.setDamage(SoulEnchantments.getDamageWithThunderlord(e.getDamage()));
+    				World world = e.getEntity().getWorld();
+    				world.strikeLightningEffect(e.getEntity().getLocation());
+				}
+			}
     		if(SoulEnchantments.validVampirismTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, SoulEnchantments.ENCHANTMENT_VAMPIRISM))  {
     			// Item has the enchantment vampirism
     			// heal for 10 % of damage dealt, or 5% if its a bow
@@ -318,9 +328,9 @@ public class Listeners implements Listener{
     			}
     			
     			double newHealth = damager.getHealth() + multiplier*e.getDamage();
-    			if(newHealth > 20.0)  {
+    			if(newHealth > damager.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue())  {
     				// to prevent setting the health above 20.0 which is the maximum
-    				damager.setHealth(20.0);
+    				damager.setHealth(damager.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
     			}
     			else  {
     				damager.setHealth(newHealth);

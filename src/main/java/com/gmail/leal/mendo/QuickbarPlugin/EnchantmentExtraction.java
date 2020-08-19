@@ -20,7 +20,7 @@ public class EnchantmentExtraction {
 	 * @post The given player now has an enchanted book with the given enchantment on it
 	 * @param player The player that will receive the enchanted book with the given enchantment
 	 * @param item The item from which to extract the enchantment
-	 * @param enchantment | The given enchantment to extract
+	 * @param enchantment The given enchantment to extract
 	 */
 	public static void extract(Player player, ItemStack item, Enchantment enchantment, int xpCost)  {
 		if(XPUtil.getPlayerExp(player) < xpCost)  {
