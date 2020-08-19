@@ -132,7 +132,7 @@ public class Listeners implements Listener{
     		int x = blockLocation.getBlockX();
     		int y = blockLocation.getBlockY();
     		int z = blockLocation.getBlockZ();
-    		World world = Bukkit.getWorld("world");
+    		World world = player.getWorld();
     		Block topDiamond = world.getBlockAt(x, y - 1, z);
     		Block bottomDiamond = world.getBlockAt(x, y - 2, z);
     		Block emerald1X = null;
