@@ -33,7 +33,7 @@ public class SoulEnchantments {
 	public final static String ENCHANTMENT_VAMPIRISM = "Vampirism";
 	public final static String ENCHANTMENT_MOVESPEED = "Swiftness";
 	public final static String ENCHANTMENT_THUNDERLORD = "Thunderlord";
-	public final static String ENCHANTMENT_TOUGHNESS = "Toughness";
+	public final static String ENCHANTMENT_TOUGHNESS = "Absorption";
 	
 	public static boolean soulEnchant(String enchantment, Player player, Plugin quickbarPlugin)  {
 		ItemStack item = player.getInventory().getItemInMainHand();
