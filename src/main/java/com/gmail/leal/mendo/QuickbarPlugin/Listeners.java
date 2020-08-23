@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -355,7 +356,7 @@ public class Listeners implements Listener{
     			}
     		}
     		if(damager instanceof Player && SoulEnchantments.validAbsorptionTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, SoulEnchantments.ENCHANTMENT_ABSORPTION))  {
-    			if(Bukkit.getPluginManager().getPlugin("mcMMO") != null && RandomChanceUtil.isActivationSuccessful(SkillActivationType.RANDOM_LINEAR_100_SCALE_WITH_CAP, SubSkillType.ARCHERY_ARROW_RETRIEVAL, damager))  {
+    			if(!item.containsEnchantment(Enchantment.ARROW_INFINITE) && Bukkit.getPluginManager().getPlugin("mcMMO") != null && RandomChanceUtil.isActivationSuccessful(SkillActivationType.RANDOM_LINEAR_100_SCALE_WITH_CAP, SubSkillType.ARCHERY_ARROW_RETRIEVAL, damager))  {
     				GeneralUtil.giveItem(damager, new ItemStack(Material.ARROW, 1));
     			}
     		}
