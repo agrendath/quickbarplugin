@@ -21,7 +21,7 @@ public class GeneralUtil {
 	
 	/**
 	 * Removes item drops of the given type in the chunk at the given location after the given delay
-	 * @param type The type of the item drops to remove
+	 * @param type The type of the item drops to remove, null to remove all item drops
 	 * @param delay The delay in ticks after which to remove the items
 	 * @param loc The location in the chunk in which to remove the items
 	 * @param plugin The plugin running this task
@@ -36,7 +36,7 @@ public class GeneralUtil {
 				for(Entity ent : entities)  {
 					if(ent instanceof Item)  {
 						Item item = (Item) ent;
-						if(item.getItemStack().getType() == type)  {
+						if(type == null || item.getItemStack().getType() == type)  {
 							item.remove();
 						}
 					}
