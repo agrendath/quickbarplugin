@@ -93,7 +93,7 @@ public class Listeners implements Listener{
 			// Handle the xp dropped
 			int xpToGive = e.getDroppedExp();
 			e.setDroppedExp(0);
-			XPUtil.changeExp(killer, xpToGive);
+			XPUtil.giveExpOrb(killer, xpToGive);
 			
 			if(killed.getLastDamageCause().getCause().equals(DamageCause.PROJECTILE) && Bukkit.getPluginManager().getPlugin("mcMMO") != null)  {
 				Location loc = killed.getLocation();
@@ -196,7 +196,7 @@ public class Listeners implements Listener{
     		// First handle the xp drops
     		int xpToGive = e.getExpToDrop();
     		e.setExpToDrop(0);
-    		XPUtil.changeExp(player, xpToGive);
+    		XPUtil.giveExpOrb(player, xpToGive);
     		
     		// Then handle the loot drops
     		boolean mcMMOEnabled = false;

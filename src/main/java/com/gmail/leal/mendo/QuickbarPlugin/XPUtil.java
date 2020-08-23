@@ -1,6 +1,7 @@
 package com.gmail.leal.mendo.QuickbarPlugin;
 
 import org.bukkit.Material;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -44,6 +45,7 @@ public class XPUtil {
 	 * @param exp the amount of experience to add or remove
 	 */
 	public static void changeExp(Player player, int exp) {
+		
 		exp += getPlayerExp(player);
 
 		if (exp < 0) {
@@ -55,6 +57,18 @@ public class XPUtil {
 		int level = (int) levelAndExp;
 		player.setLevel(level);
 		player.setExp((float) (levelAndExp - level));
+	}
+	
+	/**
+	 * Gives an xp orb of the given amount to the given player, spawning it at the player's location
+	 * @param player The player to give the orb to
+	 * @param exp The amount of xp to give with the orb
+	 * @pre exp amount must be positive
+	 *  | exp > 0
+	 */
+	public static void giveExpOrb(Player player, int exp)  {
+		ExperienceOrb orb = player.getWorld().spawn(player.getLocation(), ExperienceOrb.class);
+		orb.setExperience(exp);
 	}
 	
 	/**
