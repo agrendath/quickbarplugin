@@ -60,6 +60,8 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
 		this.saveDefaultConfig(); // Create config file if it doesn't exist already
 		reloadConfig();
 		
+		getCommand("soulenchant").setTabCompleter(new TabCompletion());
+		
 		// in case of /reload used and storage about players in a hashmap or PlayerJoinEvent
 		//for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 		//    playerList.put(player.getName(), playerData(player));

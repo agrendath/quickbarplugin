@@ -35,6 +35,18 @@ public class SoulEnchantments {
 	public final static String ENCHANTMENT_THUNDERLORD = "Thunderlord";
 	public final static String ENCHANTMENT_TOUGHNESS = "Absorption";
 	
+	public static List<String> getSoulEnchantments()  {
+		List<String> result = new ArrayList<String>();
+		result.add(ENCHANTMENT_ABSORPTION);
+		result.add(ENCHANTMENT_DOUBLEXP);
+		result.add(ENCHANTMENT_INDESTRUCTIBILITY);
+		result.add(ENCHANTMENT_VAMPIRISM);
+		result.add(ENCHANTMENT_MOVESPEED);
+		result.add(ENCHANTMENT_THUNDERLORD);
+		result.add(ENCHANTMENT_TOUGHNESS);
+		return result;
+	}
+	
 	public static boolean soulEnchant(String enchantment, Player player, Plugin quickbarPlugin)  {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		

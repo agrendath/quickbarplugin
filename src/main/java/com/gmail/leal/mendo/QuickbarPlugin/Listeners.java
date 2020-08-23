@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -12,6 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,6 +21,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -27,12 +30,16 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.datatypes.meta.BonusDropMeta;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
+import com.gmail.nossr50.datatypes.skills.SubSkillType;
 import com.gmail.nossr50.skills.mining.MiningManager;
 import com.gmail.nossr50.util.player.UserManager;
+import com.gmail.nossr50.util.random.RandomChanceUtil;
+import com.gmail.nossr50.util.skills.SkillActivationType;
 
 public class Listeners implements Listener{
 	
@@ -62,28 +69,39 @@ public class Listeners implements Listener{
     @EventHandler
     public void onEntityKill(EntityDeathEvent e)  {
     	LivingEntity killed = e.getEntity();
-    	if(killed.getKiller() != null)  {
-    		Player killer = (Player) killed.getKiller();
-    		ItemStack murderWeapon = killer.getInventory().getItemInMainHand();
-    		Material weaponType = murderWeapon.getType();
-    		
-    		if(SoulEnchantments.validDoublexpTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, SoulEnchantments.ENCHANTMENT_DOUBLEXP))  {
-    			e.setDroppedExp(e.getDroppedExp() * 2);  // Double the xp dropped
-    		}
-    		
-    		if(SoulEnchantments.validAbsorptionTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, SoulEnchantments.ENCHANTMENT_ABSORPTION))  {
-    			Collection<ItemStack> drops = e.getDrops();
-    			for(ItemStack is : drops)  {
-    				GeneralUtil.giveItem(killer, is);
-    			}
-    			e.getDrops().clear();
-    			
-    			// Handle the xp dropped
-    			int xpToGive = e.getDroppedExp();
-    			e.setDroppedExp(0);
-    			XPUtil.changeExp(killer, xpToGive);
-    		}
+    	
+    	if(killed.getKiller() == null)  {
+    		return;
     	}
+    	
+		Player killer = (Player) killed.getKiller();
+		ItemStack murderWeapon = killer.getInventory().getItemInMainHand();
+		Material weaponType = murderWeapon.getType();
+		
+		if(SoulEnchantments.validDoublexpTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, SoulEnchantments.ENCHANTMENT_DOUBLEXP))  {
+			e.setDroppedExp(e.getDroppedExp() * 2);  // Double the xp dropped
+		}
+		
+		if(SoulEnchantments.validAbsorptionTypes.contains(weaponType) && SoulEnchantments.hasCustomEnchant(murderWeapon, SoulEnchantments.ENCHANTMENT_ABSORPTION))  {
+			Collection<ItemStack> drops = e.getDrops();
+			for(ItemStack is : drops)  {
+				GeneralUtil.giveItem(killer, is);
+			}
+			e.getDrops().clear();
+			
+			// Handle the xp dropped
+			int xpToGive = e.getDroppedExp();
+			e.setDroppedExp(0);
+			XPUtil.changeExp(killer, xpToGive);
+			
+			if(killed.getLastDamageCause().getCause().equals(DamageCause.PROJECTILE) && Bukkit.getPluginManager().getPlugin("mcMMO") != null)  {
+				Location loc = killed.getLocation();
+				Plugin plugin = Bukkit.getPluginManager().getPlugin("QuickbarPlugin");
+				
+				// Remove arrow drops in the chunk after 0.25 s to prevent mcmmo from dropping the arrows back
+				GeneralUtil.removeItemsInChunkAfterDelay(Material.ARROW, 5L, loc, plugin);
+			}
+		}
     }
     
     @EventHandler
@@ -334,6 +352,11 @@ public class Listeners implements Listener{
     			}
     			else  {
     				damager.setHealth(newHealth);
+    			}
+    		}
+    		if(damager instanceof Player && SoulEnchantments.validAbsorptionTypes.contains(item.getType()) && SoulEnchantments.hasCustomEnchant(item, SoulEnchantments.ENCHANTMENT_ABSORPTION))  {
+    			if(Bukkit.getPluginManager().getPlugin("mcMMO") != null && RandomChanceUtil.isActivationSuccessful(SkillActivationType.RANDOM_LINEAR_100_SCALE_WITH_CAP, SubSkillType.ARCHERY_ARROW_RETRIEVAL, damager))  {
+    				GeneralUtil.giveItem(damager, new ItemStack(Material.ARROW, 1));
     			}
     		}
     	}

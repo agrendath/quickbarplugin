@@ -1,9 +1,13 @@
 package com.gmail.leal.mendo.QuickbarPlugin;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
@@ -11,8 +15,36 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class GeneralUtil {
+	
+	/**
+	 * Removes item drops of the given type in the chunk at the given location after the given delay
+	 * @param type The type of the item drops to remove
+	 * @param delay The delay in ticks after which to remove the items
+	 * @param loc The location in the chunk in which to remove the items
+	 * @param plugin The plugin running this task
+	 */
+	public static void removeItemsInChunkAfterDelay(final Material type, long delay, final Location loc, Plugin plugin)  {
+		new BukkitRunnable()  {
+			
+			@Override
+			public void run()  {
+				Chunk chunk = loc.getChunk();
+				Entity[] entities = chunk.getEntities();
+				for(Entity ent : entities)  {
+					if(ent instanceof Item)  {
+						Item item = (Item) ent;
+						if(item.getItemStack().getType() == type)  {
+							item.remove();
+						}
+					}
+				}
+			}
+		}.runTaskLaterAsynchronously(plugin, delay);
+	}
+	
 	public static void giveItem(Player p, ItemStack item)  {
     	Inventory inv = p.getInventory();
     	if(inv.firstEmpty() == -1)  {

@@ -3,6 +3,8 @@ com\gmail\leal\mendo\QuickbarPlugin\GeneralUtil.class
 com\gmail\leal\mendo\QuickbarPlugin\QuickbarSwitcher.class
 com\gmail\leal\mendo\QuickbarPlugin\QuickbarPlugin.class
 com\gmail\leal\mendo\QuickbarPlugin\Trackers.class
+com\gmail\leal\mendo\QuickbarPlugin\GeneralUtil$1.class
 com\gmail\leal\mendo\QuickbarPlugin\Listeners.class
+com\gmail\leal\mendo\QuickbarPlugin\TabCompletion.class
 com\gmail\leal\mendo\QuickbarPlugin\SoulEnchantments.class
 com\gmail\leal\mendo\QuickbarPlugin\XPUtil.class
