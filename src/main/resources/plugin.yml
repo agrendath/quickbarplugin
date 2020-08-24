@@ -60,3 +60,13 @@ commands:
     usage: /extract <enchantment>
     permission: quickbarplugin.extract
     permission-message: You don't have permission for that
+  booster:
+    description: Gives the player a booster for the given McMMO Skill
+    usage: /booster <skill> [amount]
+    permission: quickbarplugin.booster
+    permission-message: You don't have permission for that
+  activebooster:
+    description: Informs the player of whether they have a booster enabled and if so of which type and how much remaining xp it has
+    usage: /activebooster
+    permission: quickbarplugin.activebooster
+    permission-message: You don't have permission for that

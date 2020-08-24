@@ -12,12 +12,64 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class GeneralUtil {
+	
+	public static boolean takeAmountFromInventory(Player player, ItemStack item, int amount)  {
+		int count = 0;
+		PlayerInventory inventory = player.getInventory();
+		for(int i = 0; i < inventory.getSize(); i++)  {
+			ItemStack current = inventory.getItem(i);
+			if(current != null && current.getType() != null && current.getType().equals(item.getType()))  {
+				int left = amount - count;
+				if(current.getAmount() > left)  {
+					count += amount;
+					current.setAmount(current.getAmount() - left);
+					break;
+				}
+				else if(current.getAmount() == left)  {
+					count += amount;
+					inventory.setItem(i, new ItemStack(Material.AIR));
+					break;
+				}
+				else {
+					count += current.getAmount();
+					inventory.setItem(i, new ItemStack(Material.AIR));
+				}
+			}
+		}
+		
+		if(count < amount)  {
+			// Give items back since it failed
+			giveItem(player, new ItemStack(item.getType(), count));
+			return false;
+		}
+		return true;
+	}
+	
+	public static void takeItemFromMainHand(Player player)  {
+		ItemStack item = player.getInventory().getItemInMainHand();
+		if(item.getAmount() > 1)  {
+			item.setAmount(item.getAmount() - 1);
+		}
+		else  {
+			player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
+		}
+	}
+	
+	/**
+	 * Checks if a plugin is enabled
+	 * @param pluginName The name of the plugin to check for
+	 * @return True if the plugin is enabled, false otherwise
+	 */
+	public static boolean isPluginEnabled(String pluginName)  {
+		return Bukkit.getPluginManager().getPlugin(pluginName) != null;
+	}
 	
 	/**
 	 * Removes item drops of the given type in the chunk at the given location after the given delay

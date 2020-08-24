@@ -16,6 +16,8 @@ Functionality/Commands:
 - /janitatop - Shows the leaderboard of the top 10 players with most deaths
 - /janita2top - Shows the leaderboard of the top 10 players with most apples eaten
 - /extract \<enchantment\> - Extracts an enchantment from the item in the player's hand by giving it to them in the form of an enchanted book and removing it from the item, this costs 2000 xp and does not work for soul enchantments
+- /booster \<skillName\> \[amount\] - Give the player the specified amount of boosters that can be used by right-clicking with it in hand, this booster will double xp gained for the specified mcMMO skill for 25 000 xp, requires mcMMO. The cost is 10 diamonds per booster.
+- /activebooster - Informs the player of whether they have an active booster enabled and if so, the skill and remaining xp on the booster is given
 
 Soul Enchantments:
 - Magnetism: usable on all tools and weapons, when you destroy blocks or kill mobs/players the loot drops and xp drops get absorbed right into your inventory/xp bar
@@ -49,3 +51,5 @@ Permission Nodes:
 - quickbarplugin.janitatop: Grants access to the /janitatop command
 - quickbarplugin.janita2top: Grants access to the /janita2top command
 - quickbarplugin.extract: Grants access to the /extract command
+- quickbarplugin.booster: Grants access to the /booster command
+- quickbarplugin.activebooster: Grants access to the /activebooster command

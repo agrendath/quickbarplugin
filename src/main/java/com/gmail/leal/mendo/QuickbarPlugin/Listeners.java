@@ -29,14 +29,19 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.gmail.leal.mendo.QuickbarPlugin.Boosters.ActiveBooster;
+import com.gmail.leal.mendo.QuickbarPlugin.Boosters.BoosterManager;
+import com.gmail.leal.mendo.QuickbarPlugin.Boosters.BoosterUtil;
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.datatypes.meta.BonusDropMeta;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
 import com.gmail.nossr50.datatypes.skills.SubSkillType;
+import com.gmail.nossr50.events.experience.McMMOPlayerXpGainEvent;
 import com.gmail.nossr50.skills.mining.MiningManager;
 import com.gmail.nossr50.util.player.UserManager;
 import com.gmail.nossr50.util.random.RandomChanceUtil;
@@ -45,9 +50,33 @@ import com.gmail.nossr50.util.skills.SkillActivationType;
 public class Listeners implements Listener{
 	
 	Plugin quickbarPlugin;
+	BoosterManager boosterManager;
 	
-	public Listeners(Plugin plugin)  {
+	public Listeners(Plugin plugin, BoosterManager boosterManager)  {
 		this.quickbarPlugin = plugin;
+		this.boosterManager = boosterManager;
+	}
+	
+	@EventHandler
+	public void onMcMMOXpGain(McMMOPlayerXpGainEvent e)  {
+		if(BoosterUtil.hasActiveBoosterForSkill(e.getPlayer(), e.getSkill(), this.boosterManager))  {
+			float originalXp = e.getRawXpGained();
+			
+			// Double the xp gained from this event
+			float newXp = originalXp*2;
+			e.setRawXpGained(newXp);
+			
+			// Make sure the booster is used and loses xp remaining
+			this.boosterManager.removeXp(e.getPlayer(), originalXp);
+		}
+	}
+	
+	@EventHandler
+	public void onQuit(PlayerQuitEvent e)  {
+		// Remove eventual active boosters for the player
+		if(GeneralUtil.isPluginEnabled("mcMMO") && BoosterUtil.hasActiveBooster(e.getPlayer(), this.boosterManager))  {
+			this.boosterManager.removeBooster(e.getPlayer());
+		}
 	}
 	
 	@EventHandler
@@ -116,6 +145,10 @@ public class Listeners implements Listener{
         			QuickbarSwitcher.switchItems(player);
         			
         		}
+    		}
+    		
+    		if(GeneralUtil.isPluginEnabled("mcMMO") && e.getItem() != null && BoosterUtil.isBooster(e.getItem()))  {
+    			BoosterUtil.useBooster(player, e.getItem(), this.boosterManager);
     		}
     	}
     }

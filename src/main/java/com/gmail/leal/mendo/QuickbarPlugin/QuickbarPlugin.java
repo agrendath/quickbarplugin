@@ -44,19 +44,26 @@ import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.gmail.leal.mendo.QuickbarPlugin.Boosters.ActiveBooster;
+import com.gmail.leal.mendo.QuickbarPlugin.Boosters.BoosterManager;
+import com.gmail.leal.mendo.QuickbarPlugin.Boosters.BoosterUtil;
 import com.gmail.nossr50.mcMMO;
 import com.gmail.nossr50.datatypes.meta.BonusDropMeta;
 import com.gmail.nossr50.datatypes.player.McMMOPlayer;
+import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 import com.gmail.nossr50.skills.mining.MiningManager;
 import com.gmail.nossr50.util.player.UserManager;
 
 public class QuickbarPlugin extends JavaPlugin implements Listener{
 	
+	BoosterManager boosterManager;
+	
 	@Override
     public void onEnable() {
         // TODO Insert logic to be performed when the plugin is enabled
 		getLogger().info("Launching QuickbarPlugin...");
-		Bukkit.getPluginManager().registerEvents(new Listeners(this),  this);
+		this.boosterManager = new BoosterManager();
+		Bukkit.getPluginManager().registerEvents(new Listeners(this, this.boosterManager),  this);
 		this.saveDefaultConfig(); // Create config file if it doesn't exist already
 		reloadConfig();
 		
@@ -109,6 +116,72 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			sender.sendMessage("§4You don't have permission to manipulate tiago souls");
     			return true;
     		}
+    	}
+    	else if(cmd.getName().equalsIgnoreCase("booster"))  {
+    		if(args.length != 1 && args.length != 2)  {
+    			return false;
+    		}
+    		if(!sender.hasPermission("quickbarplugin.booster") || !(sender instanceof Player))  {
+    			sender.sendMessage("§4You are not allowed to do this");
+    			return true;
+    		}
+    		if(!GeneralUtil.isPluginEnabled("mcMMO"))  {
+    			sender.sendMessage("§McMMO is not enabled on this server");
+    			return true;
+    		}
+    		
+    		String boosterName = args[0];
+    		
+    		if(!BoosterUtil.isValidSkill(args[0]))  {
+    			sender.sendMessage("§4Invalid skill given");
+    			return true;
+    		}
+    		int amount = 1;
+    		if(args.length == 2)  {
+    			if(GeneralUtil.isInteger(args[1]))  {
+    				amount = Integer.parseInt(args[1]);
+    			}
+    			else  {
+    				sender.sendMessage("§4Not a valid amount");
+    				return true;
+    			}
+    		}
+    		
+    		Player player = (Player) sender;
+    		
+    		if(GeneralUtil.takeAmountFromInventory(player, new ItemStack(Material.DIAMOND), 10*amount))  {
+    			for(int i = 0; i < amount; i++)  {
+            		GeneralUtil.giveItem(player, BoosterUtil.getBoosterItem(PrimarySkillType.getSkill(boosterName)));
+        		}
+    		}
+    		else  {
+    			player.sendMessage("§4You do not have enough diamonds, the cost is 10 diamonds per booster");
+    		}
+    		
+    		return true;
+    	}
+    	else if(cmd.getName().equalsIgnoreCase("activebooster"))  {
+    		if(!(sender instanceof Player) || !(sender.hasPermission("quickbarplugin.activebooster")))  {
+    			sender.sendMessage("§4You are not allowed to do this");
+    			return true;
+    		}
+    		if(args.length != 0)  {
+    			return false;
+    		}
+    		if(!GeneralUtil.isPluginEnabled("mcMMO"))  {
+    			sender.sendMessage("§4McMMO is currently not enabled on this server");
+    			return true;
+    		}
+    		
+    		Player player = (Player) sender;
+    		if(BoosterUtil.hasActiveBooster(player, this.boosterManager))  {
+    			ActiveBooster booster = BoosterUtil.getBooster(player, this.boosterManager);
+    			player.sendMessage("§5You have a booster enabled for " + booster.getSkill().getName() + " with " + (int)booster.getRemainingXp() + " xp remaining. You can log out if you wish to deactivate/waste this booster");
+    		}
+    		else  {
+    			player.sendMessage("§5You do not have an active booster enabled at the moment");
+    		}
+    		return true;
     	}
     	
     	else if(cmd.getName().equalsIgnoreCase("janitatop"))  {
