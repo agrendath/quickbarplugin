@@ -16,6 +16,7 @@ public class BoosterUtil {
 	
 	public static final float BOOSTER_XP_AMOUNT = 25000;
 	public static final String XP_BOOSTER_NAME = "McMMO XP Booster";
+	public static final int BOOSTER_COST = 5; // cost of a booster in diamonds
 	
 	public static ItemStack getBoosterItem(PrimarySkillType skill)  {
 		ItemStack result = new ItemStack(Material.PAPER, 1);

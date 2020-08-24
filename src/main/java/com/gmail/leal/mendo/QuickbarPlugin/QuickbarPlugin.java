@@ -68,6 +68,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
 		reloadConfig();
 		
 		getCommand("soulenchant").setTabCompleter(new TabCompletion());
+		getCommand("booster").setTabCompleter(new TabCompletion());
 		
 		// in case of /reload used and storage about players in a hashmap or PlayerJoinEvent
 		//for (Player player : Bukkit.getServer().getOnlinePlayers()) {
@@ -149,13 +150,13 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		
     		Player player = (Player) sender;
     		
-    		if(GeneralUtil.takeAmountFromInventory(player, new ItemStack(Material.DIAMOND), 10*amount))  {
+    		if(GeneralUtil.takeAmountFromInventory(player, new ItemStack(Material.DIAMOND), BoosterUtil.BOOSTER_COST*amount))  {
     			for(int i = 0; i < amount; i++)  {
             		GeneralUtil.giveItem(player, BoosterUtil.getBoosterItem(PrimarySkillType.getSkill(boosterName)));
         		}
     		}
     		else  {
-    			player.sendMessage("§4You do not have enough diamonds, the cost is 10 diamonds per booster");
+    			player.sendMessage("§4You do not have enough diamonds, the cost is " + BoosterUtil.BOOSTER_COST + " diamonds per booster");
     		}
     		
     		return true;
