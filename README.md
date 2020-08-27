@@ -28,6 +28,7 @@ Soul Enchantments:
 - Looting: usable on bows, this is just a way to put the looting (only 3) enchantment on bows which is not possible in vanilla minecraft
 - Thunderlord: usable on all weapons and bows, gives a 10 % chance to summon lightning doing 25% of the original hit's damage extra
 - Absorption: usable on diamond or netherite armor and shields, gives the wearer a 20% health boost (aka 2 extra hearts)
+- Reflection: usable on shields, will reflect 10% of potential damage taken
 
 Soul Enchantments Costs:
 - Magnetism: 1 Tiago Soul and 2000 xp
@@ -38,6 +39,7 @@ Soul Enchantments Costs:
 - Looting: 0 Tiago Souls and 2000 xp
 - Thunderlord: 1 Tiago Soul and 3500 xp
 - Absorption: 1 Tiago Soul and 4000 xp
+- Reflection: 1 Tiago Soul and 4000 xp
 
 Permission Nodes:
 - quickbarplugin.tiago: Grants access to the /tiago command

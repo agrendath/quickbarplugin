@@ -366,7 +366,7 @@ public class Listeners implements Listener{
 				// Apply potential thunderlord damage and lightning, 10% chance
 				int random = (int) (Math.random() * 10 + 1);
 				if(random == 1)  {
-					e.setDamage(SoulEnchantments.getDamageWithThunderlord(e.getDamage()));
+					e.setDamage(SoulEnchantments.getDamageWithThunderlord(e.getFinalDamage()));
     				World world = e.getEntity().getWorld();
     				world.strikeLightningEffect(e.getEntity().getLocation());
 				}
@@ -379,7 +379,7 @@ public class Listeners implements Listener{
     				multiplier = 0.05;
     			}
     			
-    			double newHealth = damager.getHealth() + multiplier*e.getDamage();
+    			double newHealth = damager.getHealth() + multiplier*e.getFinalDamage();
     			if(newHealth > damager.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue())  {
     				// to prevent setting the health above 20.0 which is the maximum
     				damager.setHealth(damager.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
@@ -394,6 +394,12 @@ public class Listeners implements Listener{
     			}
     		}
     	}
-    	
+    	if(damager != null && e.getEntity() instanceof Player && ((Player)e.getEntity()).isBlocking())  {
+    		Player damaged = (Player)e.getEntity();
+    		if(SoulEnchantments.hasCustomEnchant(damaged.getInventory().getItemInOffHand(), SoulEnchantments.ENCHANTMENT_REFLECTION))  {
+    			// Reflect 10% of damage
+    			damager.damage(e.getDamage()*0.1, damaged);
+    		}
+    	}
     }
 }
