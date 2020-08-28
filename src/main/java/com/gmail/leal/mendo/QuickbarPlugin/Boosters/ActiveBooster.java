@@ -7,12 +7,12 @@ import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 public class ActiveBooster {
 	Player player;
 	PrimarySkillType skill;
-	int startTime;
+	long startTime;
 	
 	public ActiveBooster(Player player, PrimarySkillType skill)  {
 		this.player = player;
 		this.skill = skill;
-		this.startTime = (int)System.currentTimeMillis()*1000;
+		this.startTime = System.currentTimeMillis()*1000;
 	}
 	
 	public Player getPlayer()  {
@@ -28,8 +28,8 @@ public class ActiveBooster {
 	 * @return The remaining time of this booster in seconds
 	 */
 	public int getRemainingTime()  {
-		int current = (int)System.currentTimeMillis()*1000;
-		int elapsed = current - this.startTime;
+		long current = System.currentTimeMillis()*1000;
+		int elapsed = (int)(current - this.startTime);
 		if(BoosterUtil.BOOSTER_DURATION < elapsed)  {
 			return 0;
 		}
