@@ -177,7 +177,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     		Player player = (Player) sender;
     		if(BoosterUtil.hasActiveBooster(player, this.boosterManager))  {
     			ActiveBooster booster = BoosterUtil.getBooster(player, this.boosterManager);
-    			player.sendMessage("§5You have a booster enabled for " + booster.getSkill().getName() + " with " + (int)booster.getRemainingXp() + " xp remaining. You can log out if you wish to deactivate/waste this booster");
+    			player.sendMessage("§5You have a booster enabled for " + booster.getSkill().getName() + " with about " + booster.getRemainingTime()/60 + " minutes remaining. You can log out if you wish to deactivate/waste this booster");
     		}
     		else  {
     			player.sendMessage("§5You do not have an active booster enabled at the moment");

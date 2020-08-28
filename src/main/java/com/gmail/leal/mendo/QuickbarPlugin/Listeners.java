@@ -32,7 +32,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.gmail.leal.mendo.QuickbarPlugin.Boosters.ActiveBooster;
 import com.gmail.leal.mendo.QuickbarPlugin.Boosters.BoosterManager;
@@ -65,9 +64,6 @@ public class Listeners implements Listener{
 			// Double the xp gained from this event
 			float newXp = originalXp*2;
 			e.setRawXpGained(newXp);
-			
-			// Make sure the booster is used and loses xp remaining
-			this.boosterManager.removeXp(e.getPlayer(), originalXp);
 		}
 	}
 	
@@ -148,7 +144,7 @@ public class Listeners implements Listener{
     		}
     		
     		if(GeneralUtil.isPluginEnabled("mcMMO") && e.getItem() != null && BoosterUtil.isBooster(e.getItem()))  {
-    			BoosterUtil.useBooster(player, e.getItem(), this.boosterManager);
+    			BoosterUtil.useBooster(player, e.getItem(), this.boosterManager, this.quickbarPlugin);
     		}
     	}
     }

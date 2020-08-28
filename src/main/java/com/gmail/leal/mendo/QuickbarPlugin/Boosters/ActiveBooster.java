@@ -7,16 +7,12 @@ import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 public class ActiveBooster {
 	Player player;
 	PrimarySkillType skill;
-	float remainingXp;
+	int startTime;
 	
-	public ActiveBooster(Player player, PrimarySkillType skill, float startingXp)  {
+	public ActiveBooster(Player player, PrimarySkillType skill)  {
 		this.player = player;
 		this.skill = skill;
-		this.remainingXp = startingXp;
-	}
-	
-	public float getRemainingXp()  {
-		return this.remainingXp;
+		this.startTime = (int)System.currentTimeMillis()*1000;
 	}
 	
 	public Player getPlayer()  {
@@ -27,7 +23,16 @@ public class ActiveBooster {
 		return this.skill;
 	}
 	
-	public void removeXp(float xp)  {
-		remainingXp -= xp;
+	/**
+	 * Returns the remaining time of this booster in seconds
+	 * @return The remaining time of this booster in seconds
+	 */
+	public int getRemainingTime()  {
+		int current = (int)System.currentTimeMillis()*1000;
+		int elapsed = current - this.startTime;
+		if(BoosterUtil.BOOSTER_DURATION < elapsed)  {
+			return 0;
+		}
+		return BoosterUtil.BOOSTER_DURATION - elapsed;
 	}
 }

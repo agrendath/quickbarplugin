@@ -4,19 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.gmail.leal.mendo.QuickbarPlugin.GeneralUtil;
 import com.gmail.nossr50.datatypes.skills.PrimarySkillType;
 
 public class BoosterUtil {
 	
-	public static final float BOOSTER_XP_AMOUNT = 25000;
 	public static final String XP_BOOSTER_NAME = "McMMO XP Booster";
 	public static final int BOOSTER_COST = 5; // cost of a booster in diamonds
+	public static final int BOOSTER_DURATION = 15*60; // duration of a booster in seconds, keep this a multiple of 60 preferably
 	
 	public static ItemStack getBoosterItem(PrimarySkillType skill)  {
 		ItemStack result = new ItemStack(Material.PAPER, 1);
@@ -51,17 +56,32 @@ public class BoosterUtil {
 		return false;
 	}
 	
-	public static boolean useBooster(Player player, ItemStack booster, BoosterManager manager)  {
+	public static boolean useBooster(Player player, ItemStack booster, BoosterManager manager, Plugin plugin)  {
 		if(hasActiveBooster(player, manager))  {
 			player.sendMessage("§5You already have a booster activated, use it fully or log out to start a new one");
 			return false;
 		}
 		ItemMeta meta = booster.getItemMeta();
 		PrimarySkillType skill = PrimarySkillType.getSkill(meta.getLore().get(0));
-		ActiveBooster activeBooster = new ActiveBooster(player, skill, BOOSTER_XP_AMOUNT);
+		ActiveBooster activeBooster = new ActiveBooster(player, skill);
 		manager.addBooster(activeBooster);
 		GeneralUtil.takeItemFromMainHand(player);
-		player.sendMessage("§5You activated an McMMO XP Booster for " + skill.getName()+ ", it will last for " + BOOSTER_XP_AMOUNT + " xp!");
+		player.sendMessage("§5You activated an McMMO XP Booster for " + skill.getName()+ ", it will last for " + BOOSTER_DURATION/60 + " minutes!");
+		
+		final Player playerFinal = player;
+		final BoosterManager managerFinal = manager;
+		
+		// Schedule task to remove booster in 15 mins if not already removed by then (on logout for example)
+		new BukkitRunnable()  {
+			
+			@Override
+			public void run()  {
+				if(BoosterUtil.hasActiveBooster(playerFinal, managerFinal))  {
+					managerFinal.removeBooster(playerFinal);
+					playerFinal.sendMessage("§5Your booster has expired!");
+				}
+			}
+		}.runTaskLaterAsynchronously(plugin, BOOSTER_DURATION*20); // delay in ticks (20 ticks in 1 second)
 		
 		return true;
 	}
