@@ -12,7 +12,7 @@ public class ActiveBooster {
 	public ActiveBooster(Player player, PrimarySkillType skill)  {
 		this.player = player;
 		this.skill = skill;
-		this.startTime = System.currentTimeMillis()*1000;
+		this.startTime = System.currentTimeMillis();
 	}
 	
 	public Player getPlayer()  {
@@ -24,15 +24,15 @@ public class ActiveBooster {
 	}
 	
 	/**
-	 * Returns the remaining time of this booster in seconds
-	 * @return The remaining time of this booster in seconds
+	 * Returns the remaining time of this booster in minutes
+	 * @return The remaining time of this booster in minutes
 	 */
 	public int getRemainingTime()  {
-		long current = System.currentTimeMillis()*1000;
-		int elapsed = (int)(current - this.startTime);
-		if(BoosterUtil.BOOSTER_DURATION < elapsed)  {
+		long current = System.currentTimeMillis();
+		int elapsed = Math.toIntExact(Math.subtractExact(current, this.startTime))/1000; // elapsed time in seconds
+		if(elapsed > BoosterUtil.BOOSTER_DURATION)  {
 			return 0;
 		}
-		return BoosterUtil.BOOSTER_DURATION - elapsed;
+		return (BoosterUtil.BOOSTER_DURATION - elapsed)/60;
 	}
 }
