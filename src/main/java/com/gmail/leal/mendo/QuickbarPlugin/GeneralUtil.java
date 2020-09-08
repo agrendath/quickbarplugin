@@ -1,5 +1,6 @@
 package com.gmail.leal.mendo.QuickbarPlugin;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -168,10 +169,17 @@ public class GeneralUtil {
     }
     
     /**
-     * Apply default attributes to an item, works for diamond and netherite armor items (this is useful because when using addAttributeModifier it removes vanilla attributes from the item)
+     * Apply default attributes to an item (only if it has no soul enchantments already), works for diamond and netherite armor items (this is useful because when using addAttributeModifier it removes vanilla attributes from the item)
      * @param item the item to apply the default attributes to
      */
     public static void applyDefaultAttributes(ItemStack item)  {
+    	List<String> soulEnchantments = SoulEnchantments.getSoulEnchantmentsWithAttributes();
+    	for(String enchantment : soulEnchantments)  {
+    		if(SoulEnchantments.hasCustomEnchant(item, enchantment))  {
+    			return;
+    		}
+    	}
+    	
     	Material type = item.getType();
     	ItemMeta meta = item.getItemMeta();
     	if(type.equals(Material.DIAMOND_HELMET) || type.equals(Material.DIAMOND_CHESTPLATE) || type.equals(Material.DIAMOND_LEGGINGS) || type.equals(Material.DIAMOND_BOOTS))

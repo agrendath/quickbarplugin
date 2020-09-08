@@ -37,6 +37,10 @@ public class SoulEnchantments {
 	public final static String ENCHANTMENT_TOUGHNESS = "Absorption";
 	public final static String ENCHANTMENT_REFLECTION = "Reflection";
 	
+	/**
+	 * Returns a list of strings of all possible soul enchantments
+	 * @return a list of strings of all possible soul enchantments
+	 */
 	public static List<String> getSoulEnchantments()  {
 		List<String> result = new ArrayList<String>();
 		result.add(ENCHANTMENT_ABSORPTION);
@@ -47,6 +51,17 @@ public class SoulEnchantments {
 		result.add(ENCHANTMENT_THUNDERLORD);
 		result.add(ENCHANTMENT_TOUGHNESS);
 		result.add(ENCHANTMENT_REFLECTION);
+		return result;
+	}
+	
+	/**
+	 * Returns a list of strings of soul enchantments that modify item attributes
+	 * @return a list of strings of soul enchantments that modify item attributes
+	 */
+	public static List<String> getSoulEnchantmentsWithAttributes()  {
+		List<String> result = new ArrayList<String>();
+		result.add(SoulEnchantments.ENCHANTMENT_MOVESPEED);
+		result.add(SoulEnchantments.ENCHANTMENT_ABSORPTION);
 		return result;
 	}
 	
