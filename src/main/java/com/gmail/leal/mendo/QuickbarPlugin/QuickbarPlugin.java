@@ -106,7 +106,7 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
         			}
         			catch(NumberFormatException nfe)  {
     					sender.sendMessage("§4" + args[2] + " is not a valid amount");
-    					return false;
+    					return true;
     				}
         		}
         		else   {

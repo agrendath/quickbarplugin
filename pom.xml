@@ -22,10 +22,6 @@
 	       <id>bungeecord-repo</id>
 	       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
 	    </repository>
-	    <repository>
-		    <id>CodeMC</id>
-		    <url>https://repo.codemc.org/repository/maven-public</url>
-		</repository>
 	</repositories>
 	<dependencies>
 	    <!--Spigot API-->
@@ -48,11 +44,6 @@
 		
 		    <systemPath>${basedir}/API/mcMMO.jar</systemPath>
 		
-		</dependency>
-		<dependency>
-		    <groupId>io.github.bananapuncher714</groupId>
-		    <artifactId>NBTEditor</artifactId>
-		    <version>7.16</version>
 		</dependency>
 	</dependencies>
 </project>

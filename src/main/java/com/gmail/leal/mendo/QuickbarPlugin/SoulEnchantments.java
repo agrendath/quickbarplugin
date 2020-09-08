@@ -155,13 +155,19 @@ public class SoulEnchantments {
 				item.setItemMeta(meta);
 			}
 			else if(enchantment.equalsIgnoreCase(ENCHANTMENT_MOVESPEED))  {
-				item = GeneralUtil.addAttribute(item, "generic.movement_speed", "Movement Speed", GeneralUtil.getEquipmentSlotString(item), 0, 0.2);
+				GeneralUtil.applyDefaultAttributes(item);
+				ItemMeta meta = item.getItemMeta();
+				meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(UUID.randomUUID(), "Extra Speed", 0.2d, AttributeModifier.Operation.ADD_SCALAR, EquipmentSlot.FEET));
+				item.setItemMeta(meta);
 			}
 			else if(enchantment.equalsIgnoreCase("looting"))  {
 				item.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 3);
 			}
 			else if(enchantment.equalsIgnoreCase(ENCHANTMENT_TOUGHNESS))  {
-				item = GeneralUtil.addAttribute(item, "generic.max_health", "Max Health", GeneralUtil.getEquipmentSlotString(item), 1, 0.2);
+				GeneralUtil.applyDefaultAttributes(item);
+				ItemMeta meta = item.getItemMeta();
+				meta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(UUID.randomUUID(), "Extra Health", 0.2d, AttributeModifier.Operation.ADD_SCALAR, GeneralUtil.getEquipmentSlot(item)));
+				item.setItemMeta(meta);
 			}
 			
 			player.sendMessage("§5Enchantment Complete");
@@ -190,13 +196,13 @@ public class SoulEnchantments {
 				}
 				else  {
 					sender.sendMessage("§4Cannot find player " + receiverName);
-    				return false;
+    				return true;
 				}
 			}
 		}
 		else  {
 			sender.sendMessage("§4Invalid amount or you do not have enough souls to complete this transaction");
-			return false;
+			return true;
 		}
 	}
 	

@@ -6,8 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -19,32 +17,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.google.common.collect.Multimap;
-
-import io.github.bananapuncher714.nbteditor.NBTEditor;
-import io.github.bananapuncher714.nbteditor.NBTEditor.NBTCompound;
 
 public class GeneralUtil {
-	
-	public static ItemStack addAttribute(ItemStack item, String attributeName, String attributeDisplayName, String attributeSlot, int operation, double amount)  {
-		NBTCompound compound = NBTEditor.getNBTCompound(item);
-		UUID uuid = UUID.randomUUID();
-		long uuidMost = uuid.getMostSignificantBits();
-		long uuidLeast = uuid.getLeastSignificantBits();
-		
-		compound.set(attributeName, "tag", "AttributeModifiers", null, "AttributeName");
-		compound.set(attributeDisplayName, "tag", "AttributeModifiers", 0, "Name");
-		compound.set(attributeSlot, "tag", "AttributeModifiers", 0, "Slot");
-		compound.set(operation, "tag", "AttributeModifiers", 0, "Operation");
-		compound.set(amount, "tag", "AttributeModifiers", 0, "Amount");
-		compound.set(uuidMost, "tag", "AttributeModifiers", 0, "UUIDMost");
-		compound.set(uuidLeast, "tag", "AttributeModifiers", 0, "UUIDLeast");
-		return NBTEditor.getItemFromTag(compound);
-	}
 	
 	public static boolean takeAmountFromInventory(Player player, ItemStack item, int amount)  {
 		int count = 0;
@@ -190,25 +167,47 @@ public class GeneralUtil {
     	}
     }
     
-    public static String getEquipmentSlotString(ItemStack item)  {
-    	Material t = item.getType();
-    	if(t.equals(Material.SHIELD))  {
-    		return "offhand";
+    /**
+     * Apply default attributes to an item, works for diamond and netherite armor items (this is useful because when using addAttributeModifier it removes vanilla attributes from the item)
+     * @param item the item to apply the default attributes to
+     */
+    public static void applyDefaultAttributes(ItemStack item)  {
+    	Material type = item.getType();
+    	ItemMeta meta = item.getItemMeta();
+    	if(type.equals(Material.DIAMOND_HELMET) || type.equals(Material.DIAMOND_CHESTPLATE) || type.equals(Material.DIAMOND_LEGGINGS) || type.equals(Material.DIAMOND_BOOTS))
+    		meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "Base Armor Toughness", 2.0, AttributeModifier.Operation.ADD_NUMBER, getEquipmentSlot(item)));
+    	else if(type.equals(Material.NETHERITE_HELMET) || type.equals(Material.NETHERITE_CHESTPLATE) || type.equals(Material.NETHERITE_LEGGINGS) || type.equals(Material.NETHERITE_BOOTS))  {
+    		meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "Base Armor Toughness", 3.0, AttributeModifier.Operation.ADD_NUMBER, getEquipmentSlot(item)));
+    		meta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "Base Knockback Resistance", 0.1, AttributeModifier.Operation.ADD_NUMBER, getEquipmentSlot(item)));
     	}
-    	else if(t.equals(Material.LEATHER_HELMET) || t.equals(Material.IRON_HELMET) || t.equals(Material.CHAINMAIL_HELMET) || t.equals(Material.GOLDEN_HELMET) || t.equals(Material.DIAMOND_HELMET) || t.equals(Material.NETHERITE_HELMET))  {
-    		return "head";
+    	switch(type)  {
+    	case DIAMOND_HELMET:
+    		meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "Base Armor", 3.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD));
+    		break;
+    	case DIAMOND_CHESTPLATE:
+    		meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "Base Armor", 8.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+    		break;
+    	case DIAMOND_LEGGINGS:
+    		meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "Base Armor", 6.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+    		break;
+    	case DIAMOND_BOOTS:
+    		meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "Base Armor", 3.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET));
+    		break;
+    	case NETHERITE_HELMET:
+    		meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "Base Armor", 3.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD));
+    		break;
+    	case NETHERITE_CHESTPLATE:
+    		meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "Base Armor", 8.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+    		break;
+    	case NETHERITE_LEGGINGS:
+    		meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "Base Armor", 6.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+    		break;
+    	case NETHERITE_BOOTS:
+    		meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "Base Armor", 3.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET));
+    		break;
+    	default:
+    		break;
     	}
-    	else if(t.equals(Material.LEATHER_CHESTPLATE) || t.equals(Material.IRON_CHESTPLATE) || t.equals(Material.CHAINMAIL_CHESTPLATE) || t.equals(Material.GOLDEN_CHESTPLATE) || t.equals(Material.DIAMOND_CHESTPLATE) || t.equals(Material.NETHERITE_CHESTPLATE))  {
-    		return "chest";
-    	}
-    	else if(t.equals(Material.LEATHER_LEGGINGS) || t.equals(Material.IRON_LEGGINGS) || t.equals(Material.CHAINMAIL_LEGGINGS) || t.equals(Material.GOLDEN_LEGGINGS) || t.equals(Material.DIAMOND_LEGGINGS) || t.equals(Material.NETHERITE_LEGGINGS))  {
-    		return "legs";
-    	}
-    	else if(t.equals(Material.LEATHER_BOOTS) || t.equals(Material.IRON_BOOTS) || t.equals(Material.CHAINMAIL_BOOTS) || t.equals(Material.GOLDEN_BOOTS) || t.equals(Material.DIAMOND_BOOTS) || t.equals(Material.NETHERITE_BOOTS))  {
-    		return "feet";
-    	}
-    	else  {
-    		return null;
-    	}
+    	item.setItemMeta(meta);
     }
 }
