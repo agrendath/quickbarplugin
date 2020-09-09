@@ -22,6 +22,7 @@ public class BoosterUtil {
 	public static final String XP_BOOSTER_NAME = "McMMO XP Booster";
 	public static final int BOOSTER_COST = 5; // cost of a booster in diamonds
 	public static final int BOOSTER_DURATION = 15*60; // duration of a booster in seconds, keep this a multiple of 60 preferably
+	public static final int EXTENDED_BOOSTER_DURATION = BOOSTER_DURATION*2; // duration of a booster for skills that are harder to farm
 	
 	public static ItemStack getBoosterItem(PrimarySkillType skill)  {
 		ItemStack result = new ItemStack(Material.PAPER, 1);
@@ -71,6 +72,11 @@ public class BoosterUtil {
 		final Player playerFinal = player;
 		final BoosterManager managerFinal = manager;
 		
+		int booster_duration = BOOSTER_DURATION;
+		if(skill.equals(PrimarySkillType.ALCHEMY) || skill.equals(PrimarySkillType.FISHING) || skill.equals(PrimarySkillType.SMELTING) || skill.equals(PrimarySkillType.TAMING))  {
+			booster_duration = EXTENDED_BOOSTER_DURATION;
+		}
+		
 		// Schedule task to remove booster in 15 mins if not already removed by then (on logout for example)
 		new BukkitRunnable()  {
 			
@@ -81,7 +87,7 @@ public class BoosterUtil {
 					playerFinal.sendMessage("§5Your booster has expired!");
 				}
 			}
-		}.runTaskLaterAsynchronously(plugin, BOOSTER_DURATION*20); // delay in ticks (20 ticks in 1 second)
+		}.runTaskLaterAsynchronously(plugin, booster_duration*20); // delay in ticks (20 ticks in 1 second)
 		
 		return true;
 	}

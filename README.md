@@ -16,7 +16,7 @@ Functionality/Commands:
 - /janitatop - Shows the leaderboard of the top 10 players with most deaths
 - /janita2top - Shows the leaderboard of the top 10 players with most apples eaten
 - /extract \<enchantment\> - Extracts an enchantment from the item in the player's hand by giving it to them in the form of an enchanted book and removing it from the item, this costs 2000 xp and does not work for soul enchantments
-- /booster \<skillName\> \[amount\] - Give the player the specified amount of boosters that can be used by right-clicking with it in hand, this booster will double xp gained for the specified mcMMO skill for 25 000 xp, requires mcMMO. The cost is 5 diamonds per booster.
+- /booster \<skillName\> \[amount\] - Give the player the specified amount of boosters that can be used by right-clicking with it in hand, this booster will double xp gained for the specified mcMMO skill for 15 minutes, requires mcMMO. The cost is 5 diamonds per booster. Boosters for Alchemy, Fishing, Smelting and Taming last twice as long (30 minutes) because these skills are harder to farm.
 - /activebooster - Informs the player of whether they have an active booster enabled and if so, the skill and remaining xp on the booster is given
 
 Soul Enchantments:
