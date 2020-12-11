@@ -356,8 +356,14 @@ public class QuickbarPlugin extends JavaPlugin implements Listener{
     			sender.sendMessage("§4Invalid arguments");
 				return false;
     		}
+    		Enchantment enchantment = null;
+    		try  {
+    			enchantment = EnchantmentWrapper.getByKey(NamespacedKey.minecraft(args[0]));
+    		} catch(IllegalArgumentException e)  {
+    			sender.sendMessage("§4Invalid enchantment");
+    			return true;
+    		}
     		
-    		Enchantment enchantment = EnchantmentWrapper.getByKey(NamespacedKey.minecraft(args[0]));
     		if(enchantment == null)  {
     			sender.sendMessage("§4Invalid enchantment");
 				return true;
